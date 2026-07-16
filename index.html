@@ -548,6 +548,23 @@ const CONTRACT_ABI = [
 let provider, signer, userAddress;
 let selected = CORRIDORS[0];
 let txHistory = [];
+const readProvider = new ethers.providers.JsonRpcProvider(ARC_RPC); // reused instead of recreated per call
+
+// Retries a call a few times with backoff if the RPC returns 429 (rate limited)
+async function withRetry(fn, retries = 3, delayMs = 800) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const is429 = e?.status === 429 || /429|rate limit/i.test(e?.message || '') || /429|rate limit/i.test(e?.error?.message || '');
+      if (is429 && attempt < retries) {
+        await new Promise(r => setTimeout(r, delayMs * Math.pow(2, attempt)));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
 
 window.addEventListener('load', async () => {
   renderCorridors();
@@ -604,9 +621,8 @@ function updateAddrDisplay() {
 
 async function loadStats() {
   try {
-    const rpc = new ethers.providers.JsonRpcProvider(ARC_RPC);
-    const c   = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, rpc);
-    const s   = await c.getStats();
+    const c = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, readProvider);
+    const s = await withRetry(() => c.getStats());
     document.getElementById('statTxCount').textContent = s.totalTxCount.toString();
     document.getElementById('statVolume').textContent  = parseFloat(ethers.utils.formatUnits(s.totalVolume, USDC_DEC)).toFixed(4);
     if (s.paused) { document.getElementById('statStatus').textContent = 'Paused'; document.getElementById('statStatus').style.color = 'var(--amber)'; }
@@ -639,21 +655,32 @@ async function connectWallet() {
 
 async function refreshBal() {
   if (!signer) return;
-  const bal = await new ethers.Contract(USDC_ADDR, USDC_ABI, provider).balanceOf(userAddress);
-  document.getElementById('walletBal').textContent = parseFloat(ethers.utils.formatUnits(bal, USDC_DEC)).toFixed(2)+' USDC';
+  try {
+    const bal = await withRetry(() => new ethers.Contract(USDC_ADDR, USDC_ABI, provider).balanceOf(userAddress));
+    document.getElementById('walletBal').textContent = parseFloat(ethers.utils.formatUnits(bal, USDC_DEC)).toFixed(2)+' USDC';
+  } catch(e) { console.warn(e); }
 }
 
 async function loadHistory() {
+  const list = document.getElementById('txList');
   try {
     const c = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, provider);
-    const events = await c.queryFilter(c.filters.RemittanceSent(userAddress), -10000);
+    const latestBlock = await withRetry(() => provider.getBlockNumber());
+    const fromBlock   = Math.max(0, latestBlock - 10000);
+    const events = await withRetry(() => c.queryFilter(c.filters.RemittanceSent(userAddress), fromBlock, latestBlock));
     txHistory = events.reverse().slice(0,20).map(e => ({
       country: e.args.country, currency: e.args.currency,
       amount: ethers.utils.formatUnits(e.args.amount, USDC_DEC),
       memo: e.args.memo, txHash: e.transactionHash
     }));
     renderHistory();
-  } catch(e) { console.warn(e); }
+  } catch(e) {
+    console.warn(e);
+    const rateLimited = e?.status === 429 || /429|rate limit/i.test(e?.message || '');
+    list.innerHTML = rateLimited
+      ? '<div class="tx-empty">RPC is rate-limited right now. Please wait a moment and refresh.</div>'
+      : '<div class="tx-empty">Unable to load transfer history right now. Please refresh and try again.</div>';
+  }
 }
 
 function escapeHtml(str) {
