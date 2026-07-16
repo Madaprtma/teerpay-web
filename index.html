@@ -1,4 +1,3 @@
-cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,28 +5,28 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TeerPay — Cross-border USDC Remittance on Arc</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Poppins:wght@500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #07090f;
-      --bg2:       #0d1117;
-      --surface:   #111823;
-      --surface2:  #161e2d;
-      --surface3:  #1c2538;
-      --border:    rgba(255,255,255,0.07);
-      --border2:   rgba(255,255,255,0.12);
-      --accent:    #4f7ef8;
-      --accent2:   #38bdf8;
-      --accentg:   linear-gradient(135deg,#4f7ef8,#38bdf8);
-      --green:     #22c55e;
-      --green-bg:  rgba(34,197,94,0.1);
-      --amber:     #f59e0b;
-      --red:       #ef4444;
-      --text:      #e8ecf4;
-      --text2:     #8b9ab8;
-      --text3:     #4e5e78;
+      --bg:        #f0f7ff;
+      --bg2:       #e8f4ff;
+      --surface:   rgba(255,255,255,0.85);
+      --surface2:  #f0f7ff;
+      --surface3:  #e0eefb;
+      --border:    #bfdbfe;
+      --border2:   #93c5fd;
+      --accent:    #2563eb;
+      --accent2:   #0ea5e9;
+      --accentg:   linear-gradient(135deg,#2563eb,#0ea5e9);
+      --green:     #16a34a;
+      --green-bg:  rgba(22,163,74,0.1);
+      --amber:     #d97706;
+      --red:       #dc2626;
+      --text:      #1e293b;
+      --text2:     #64748b;
+      --text3:     #94a3b8;
       --mono:      'DM Mono', monospace;
       --head:      'Syne', sans-serif;
       --body:      'Inter', sans-serif;
@@ -35,33 +34,41 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
       --r2:        14px;
     }
 
-    body { background: var(--bg); color: var(--text); font-family: var(--body); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+    body {
+      background: linear-gradient(135deg, #ffffff 0%, #e8f4ff 50%, #dbeeff 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
     /* NAV */
     nav {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem; height: 60px;
-      background: rgba(7,9,15,0.8); backdrop-filter: blur(16px);
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 100;
     }
     .logo-wrap { display: flex; align-items: center; gap: 10px; }
     .logo-icon {
       width: 32px; height: 32px; border-radius: 8px;
-      background: var(--accentg);
+      background: #000;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
     }
+    .font-poppins { font-family: 'Poppins', sans-serif !important; font-weight: 500 !important; }
     .logo-text { font-family: var(--head); font-size: 1.15rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
-    .logo-text span { color: var(--accent2); }
+    .logo-text span { color: var(--accent); }
     .nav-center { display: flex; gap: 2rem; }
     .nav-link { font-size: 13px; color: var(--text2); text-decoration: none; cursor: pointer; transition: color .15s; }
     .nav-link:hover, .nav-link.active { color: var(--text); }
     .nav-right { display: flex; align-items: center; gap: 10px; }
     .badge-net {
       font-size: 11px; font-weight: 500; font-family: var(--mono);
-      background: rgba(79,126,248,0.12); color: var(--accent);
-      border: 1px solid rgba(79,126,248,0.25);
+      background: #dbeafe; color: var(--accent);
+      border: 1px solid #93c5fd;
       padding: 3px 10px; border-radius: 20px;
     }
     #connectBtn {
@@ -73,7 +80,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     #connectBtn:hover { opacity: .85; }
     #walletInfo {
       display: none; align-items: center; gap: 8px;
-      background: var(--surface); border: 1px solid var(--border2);
+      background: #fff; border: 1px solid var(--border);
       padding: 5px 12px; border-radius: var(--r); font-size: 13px; font-family: var(--mono);
     }
     .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
@@ -88,8 +95,8 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
       color: var(--accent2); margin-bottom: 1.5rem;
-      border: 1px solid rgba(56,189,248,0.2); padding: 4px 12px; border-radius: 20px;
-      background: rgba(56,189,248,0.06);
+      border: 1px solid #93c5fd; padding: 4px 12px; border-radius: 20px;
+      background: #dbeafe;
     }
     .hero h1 {
       font-family: var(--head); font-size: clamp(2.4rem,5vw,3.8rem);
@@ -104,7 +111,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     .hero-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     .pill {
       font-size: 12px; color: var(--text2);
-      background: var(--surface); border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.8); border: 1px solid var(--border);
       padding: 5px 14px; border-radius: 20px;
     }
     .pill strong { color: var(--text); }
@@ -116,9 +123,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
       border-radius: var(--r2); overflow: hidden;
       max-width: 900px; margin: 0 auto 3rem;
     }
-    .stat-cell {
-      background: var(--surface); padding: 1.25rem 1.5rem;
-    }
+    .stat-cell { background: rgba(255,255,255,0.85); padding: 1.25rem 1.5rem; }
     .stat-cell-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; }
     .stat-cell-val { font-family: var(--head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
     .stat-cell-val.blue { color: var(--accent); }
@@ -134,8 +139,9 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
 
     /* PANEL */
     .panel {
-      background: var(--surface); border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.85); border: 1px solid var(--border);
       border-radius: var(--r2); overflow: hidden;
+      backdrop-filter: blur(8px);
     }
     .panel-header {
       display: flex; align-items: center; gap: 10px;
@@ -143,7 +149,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     }
     .panel-icon {
       width: 30px; height: 30px; border-radius: 8px;
-      background: rgba(79,126,248,0.12);
+      background: #dbeafe;
       display: flex; align-items: center; justify-content: center;
       font-size: 14px;
     }
@@ -154,24 +160,24 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     .corridor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
     .corridor-btn {
       display: flex; align-items: center; gap: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
+      background: #f0f7ff; border: 1px solid var(--border);
       border-radius: var(--r); padding: 9px 11px;
       cursor: pointer; transition: border-color .15s, background .15s;
       text-align: left;
     }
-    .corridor-btn:hover { border-color: var(--border2); background: var(--surface3); }
-    .corridor-btn.active { border-color: var(--accent); background: rgba(79,126,248,0.08); }
+    .corridor-btn:hover { border-color: var(--border2); background: #e0eefb; }
+    .corridor-btn.active { border-color: var(--accent); background: #dbeafe; }
     .corridor-flag { font-size: 1.3rem; flex-shrink: 0; }
     .corridor-info { min-width: 0; }
     .corridor-country { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .corridor-currency { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+    .corridor-currency { font-size: 10px; color: var(--accent); font-family: var(--mono); }
 
     /* FORM */
     .form-row { margin-bottom: 1rem; }
     .form-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; display: block; }
     .input-wrap { position: relative; }
     .form-input {
-      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      width: 100%; background: #f0f7ff; border: 1px solid var(--border);
       color: var(--text); padding: 10px 12px; border-radius: var(--r);
       font-family: var(--body); font-size: 14px; outline: none;
       transition: border-color .15s;
@@ -183,7 +189,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     }
     .to-addr {
       font-family: var(--mono); font-size: 11px;
-      color: var(--text3); background: var(--surface2);
+      color: var(--text3); background: #f0f7ff;
       border: 1px solid var(--border); border-radius: var(--r);
       padding: 8px 12px; margin-bottom: 1rem;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -203,9 +209,9 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
       display: none; margin-top: .85rem; padding: 11px 14px;
       border-radius: var(--r); font-size: 13px; line-height: 1.5;
     }
-    #statusBox.info    { background: rgba(79,126,248,.1);  border: 1px solid rgba(79,126,248,.25);  color: #93b8ff; }
-    #statusBox.success { background: rgba(34,197,94,.08);  border: 1px solid rgba(34,197,94,.25);   color: #86efac; }
-    #statusBox.error   { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.25);   color: #fca5a5; }
+    #statusBox.info    { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+    #statusBox.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+    #statusBox.error   { background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; }
     #statusBox a { color: inherit; text-decoration: underline; }
 
     /* RIGHT COLUMN */
@@ -222,7 +228,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     .badge-verified {
       display: inline-flex; align-items: center; gap: 4px;
       font-size: 11px; background: var(--green-bg); color: var(--green);
-      border: 1px solid rgba(34,197,94,.2); padding: 2px 8px; border-radius: 20px;
+      border: 1px solid rgba(22,163,74,.2); padding: 2px 8px; border-radius: 20px;
     }
     .copy-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 11px; margin-left: 6px; font-family: var(--mono); }
     .copy-btn:hover { color: var(--accent); }
@@ -249,11 +255,11 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     .step:not(:last-child)::after { content:''; position: absolute; left: 15px; top: 36px; bottom: 0; width: 1px; background: var(--border); }
     .step-num {
       width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      background: var(--surface2); border: 1px solid var(--border2);
+      background: #f0f7ff; border: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 600; color: var(--text2); z-index: 1;
     }
-    .step-num.done { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: var(--green); }
+    .step-num.done { background: var(--green-bg); border-color: rgba(22,163,74,.3); color: var(--green); }
     .step-content { flex: 1; }
     .step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
     .step-desc { font-size: 12px; color: var(--text3); }
@@ -262,6 +268,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
     footer {
       border-top: 1px solid var(--border); padding: 2rem;
       text-align: center; color: var(--text3); font-size: 12px;
+      background: rgba(255,255,255,0.6);
     }
     footer a { color: var(--accent); text-decoration: none; }
 
@@ -278,8 +285,13 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
 
 <nav>
   <div class="logo-wrap">
-    <div class="logo-icon">💸</div>
-    <span class="logo-text">Teer<span>Pay</span></span>
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 1984 1984" fill="none">
+        <polygon points="370,759 1015,1342 368,1343 368,1527 1550,1527 1550,1343 1291,1343 645,759" fill="white"/>
+        <polygon points="433,455 433,639 692,640 1339,1224 1613,1224 967,640 1614,639 1614,455" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-text font-poppins">Teer<span>Pay</span></span>
   </div>
   <div class="nav-center">
     <span class="nav-link active">Send</span>
@@ -299,7 +311,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
 
 <div class="hero">
   <div class="hero-eyebrow">⬡ Powered by Arc Testnet</div>
-  <h1>Send USDC across borders,<br><span class="grad">instantly.</span></h1>
+  <h1 class="font-poppins">Send USDC across borders,<br><span class="grad">instantly.</span></h1>
   <p class="hero-sub">TeerPay is a decentralized remittance protocol on Arc. No KYC, near-zero fees, every transfer stored permanently on-chain.</p>
   <div class="hero-pills">
     <div class="pill"><strong>~0.001 USDC</strong> per transfer</div>
@@ -322,12 +334,12 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
   </div>
   <div class="stat-cell">
     <div class="stat-cell-label">Corridors</div>
-    <div class="stat-cell-val green">5</div>
+    <div class="stat-cell-val green font-poppins">5</div>
     <div class="stat-cell-sub">countries supported</div>
   </div>
   <div class="stat-cell">
     <div class="stat-cell-label">Contract status</div>
-    <div class="stat-cell-val green" id="statStatus">Active</div>
+    <div class="stat-cell-val green font-poppins" id="statStatus">Active</div>
     <div class="stat-cell-sub">verified on ArcScan</div>
   </div>
 </div>
@@ -353,7 +365,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
         </div>
 
         <div class="form-row">
-          <label class="form-label">Amount</label>
+          <label class="form-label" for="amountInput">Amount</label>
           <div class="input-wrap">
             <input class="form-input" type="number" id="amountInput" value="0.01" min="0.01" max="100" step="0.01" style="padding-right:54px;" />
             <span class="input-suffix">USDC</span>
@@ -361,7 +373,7 @@ cat > /home/claude/teerpay-web/index.html << 'HTMLEOF'
         </div>
 
         <div class="form-row">
-          <label class="form-label">Memo <span style="color:var(--text3);text-transform:none;letter-spacing:0;">(optional — stored on-chain)</span></label>
+          <label class="form-label" for="memoInput">Memo <span style="color:var(--text3);text-transform:none;letter-spacing:0;">(optional — stored on-chain)</span></label>
           <input class="form-input" type="text" id="memoInput" placeholder="e.g. monthly family transfer" maxlength="80" />
         </div>
 
@@ -537,7 +549,36 @@ let provider, signer, userAddress;
 let selected = CORRIDORS[0];
 let txHistory = [];
 
-window.addEventListener('load', () => { renderCorridors(); loadStats(); });
+window.addEventListener('load', async () => {
+  renderCorridors();
+  loadStats();
+
+  if (window.ethereum) {
+    // Restore session if the wallet is already connected/authorized
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts.length) await connectWallet();
+    } catch (e) { console.warn(e); }
+
+    // Keep UI in sync with wallet-side changes
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (!accounts.length) { disconnectWallet(); }
+      else { connectWallet(); }
+    });
+    window.ethereum.on('chainChanged', () => { window.location.reload(); });
+  }
+});
+
+function disconnectWallet() {
+  provider = signer = userAddress = undefined;
+  txHistory = [];
+  document.getElementById('connectBtn').style.display = 'inline-block';
+  document.getElementById('walletInfo').style.display = 'none';
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Connect wallet to send';
+  renderHistory();
+}
 
 function renderCorridors() {
   document.getElementById('corridorGrid').innerHTML = CORRIDORS.map((c,i) => `
@@ -579,7 +620,7 @@ async function connectWallet() {
     try {
       await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + ARC_CHAIN_ID.toString(16) }] });
     } catch(e) {
-      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x' + ARC_CHAIN_ID.toString(16), chainName: 'Arc Testnet', nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 }, rpcUrls: [ARC_RPC], blockExplorerUrls: [ARC_EXPLORER] }] });
+      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x' + ARC_CHAIN_ID.toString(16), chainName: 'Arc Testnet', nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: USDC_DEC }, rpcUrls: [ARC_RPC], blockExplorerUrls: [ARC_EXPLORER] }] });
     }
     provider    = new ethers.providers.Web3Provider(window.ethereum);
     signer      = provider.getSigner();
@@ -615,6 +656,10 @@ async function loadHistory() {
   } catch(e) { console.warn(e); }
 }
 
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
 function renderHistory() {
   const flags = { Indonesia:'🇮🇩', Philippines:'🇵🇭', Vietnam:'🇻🇳', Nigeria:'🇳🇬', India:'🇮🇳' };
   const list  = document.getElementById('txList');
@@ -624,8 +669,8 @@ function renderHistory() {
     <div class="tx-item">
       <span class="tx-flag">${flags[tx.country]||'🌍'}</span>
       <div class="tx-mid">
-        <div class="tx-country">${tx.country} <span style="color:var(--text3);font-size:11px;font-family:var(--mono);">${tx.currency}</span></div>
-        <div class="tx-memo">${tx.memo||'—'}</div>
+        <div class="tx-country">${escapeHtml(tx.country)} <span style="color:var(--text3);font-size:11px;font-family:var(--mono);">${escapeHtml(tx.currency)}</span></div>
+        <div class="tx-memo">${escapeHtml(tx.memo || '—')}</div>
       </div>
       <div class="tx-right">
         <div class="tx-amount">${parseFloat(tx.amount).toFixed(4)} USDC</div>
@@ -672,5 +717,3 @@ function scrollToContract() { document.getElementById('contractSection').scrollI
 </script>
 </body>
 </html>
-HTMLEOF
-echo "done - $(wc -l < /home/claude/teerpay-web/index.html) lines"
