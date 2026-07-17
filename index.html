@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TeerPay — Cross-border USDC Remittance on Arc</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTg0IDE5ODQiPgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTk4NCIgaGVpZ2h0PSIxOTg0IiByeD0iMjIwIiBmaWxsPSJibGFjayIvPgo8cG9seWdvbiBwb2ludHM9IjM3MCw3NTkgMTAxNSwxMzQyIDM2OCwxMzQzIDM2OCwxNTI3IDE1NTAsMTUyNyAxNTUwLDEzNDMgMTI5MSwxMzQzIDY0NSw3NTkiIGZpbGw9IndoaXRlIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDMzLDQ1NSA0MzMsNjM5IDY5Miw2NDAgMTMzOSwxMjI0IDE2MTMsMTIyNCA5NjcsNjQwIDE2MTQsNjM5IDE2MTQsNDU1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Poppins:wght@500&display=swap" rel="stylesheet">
   <style>
@@ -205,14 +206,14 @@
     .send-btn:disabled { opacity: .35; cursor: not-allowed; }
 
     /* STATUS */
-    #statusBox {
+    #statusBox, #akStatusBox {
       display: none; margin-top: .85rem; padding: 11px 14px;
       border-radius: var(--r); font-size: 13px; line-height: 1.5;
     }
-    #statusBox.info    { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
-    #statusBox.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
-    #statusBox.error   { background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; }
-    #statusBox a { color: inherit; text-decoration: underline; }
+    #statusBox.info, #akStatusBox.info       { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+    #statusBox.success, #akStatusBox.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+    #statusBox.error, #akStatusBox.error     { background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; }
+    #statusBox a, #akStatusBox a { color: inherit; text-decoration: underline; }
 
     /* RIGHT COLUMN */
     .right-col { display: flex; flex-direction: column; gap: 16px; }
@@ -421,6 +422,36 @@
         </div>
       </div>
     </div>
+
+    <!-- QUICK SEND (APP KIT) -->
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-header">
+        <div class="panel-icon">🧩</div>
+        <span class="panel-title">Quick Send</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);">Powered by Circle App Kit</span>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.6;">
+          Send USDC directly to any wallet address on Arc Testnet — no corridor, no memo, no custom contract. This uses Circle's <code style="font-family:var(--mono);">@circle-fin/app-kit</code> <strong>Send</strong> capability directly.
+        </p>
+        <div class="form-row">
+          <label class="form-label" for="akToAddress">Recipient address</label>
+          <input class="form-input" type="text" id="akToAddress" placeholder="0x..." />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="akAmount">Amount</label>
+          <div class="input-wrap">
+            <input class="form-input" type="number" id="akAmount" value="1.00" min="0.01" step="0.01" style="padding-right:54px;" />
+            <span class="input-suffix">USDC</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="send-btn" id="akEstimateBtn" onclick="estimateAppKitSend()" style="background:#fff;color:var(--accent);border:1px solid var(--border);">Estimate</button>
+          <button class="send-btn" id="akSendBtn" onclick="sendViaAppKit()">Send via App Kit →</button>
+        </div>
+        <div id="akStatusBox"></div>
+      </div>
+    </div>
   </div>
 
   <!-- RIGHT -->
@@ -518,6 +549,67 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<!-- Circle App Kit — Quick Send -->
+<script type="module">
+  import { AppKit } from 'https://esm.sh/@circle-fin/app-kit';
+  import { createViemAdapterFromProvider } from 'https://esm.sh/@circle-fin/adapter-viem-v2';
+
+  const kit = new AppKit();
+  let akAdapter = null;
+
+  async function getAppKitAdapter() {
+    if (!window.ethereum) throw new Error('MetaMask not found. Please install MetaMask.');
+    if (!akAdapter) akAdapter = await createViemAdapterFromProvider({ provider: window.ethereum });
+    return akAdapter;
+  }
+
+  function akShowStatus(type, msg) {
+    const b = document.getElementById('akStatusBox');
+    b.className = type; b.innerHTML = msg; b.style.display = 'block';
+  }
+
+  window.estimateAppKitSend = async function () {
+    const to     = document.getElementById('akToAddress').value.trim();
+    const amount = document.getElementById('akAmount').value;
+    if (!to)     { akShowStatus('error', 'Enter a recipient address first.'); return; }
+    if (!amount || parseFloat(amount) <= 0) { akShowStatus('error', 'Enter a valid amount.'); return; }
+    try {
+      akShowStatus('info', '⏳ Estimating via App Kit...');
+      const adapter  = await getAppKitAdapter();
+      const estimate = await kit.estimateSend({
+        from: { adapter, chain: 'Arc_Testnet' },
+        to, amount, token: 'USDC',
+      });
+      akShowStatus('info', `Estimated fee: ${estimate?.fee ?? 'n/a'} · You'll send ${amount} USDC to ${to.slice(0,6)}...${to.slice(-4)}`);
+    } catch (e) {
+      akShowStatus('error', '❌ ' + (e?.message || 'Estimate failed').slice(0, 140));
+    }
+  };
+
+  window.sendViaAppKit = async function () {
+    const to     = document.getElementById('akToAddress').value.trim();
+    const amount = document.getElementById('akAmount').value;
+    if (!to)     { akShowStatus('error', 'Enter a recipient address first.'); return; }
+    if (!amount || parseFloat(amount) <= 0) { akShowStatus('error', 'Enter a valid amount.'); return; }
+    const btn = document.getElementById('akSendBtn');
+    btn.disabled = true;
+    try {
+      akShowStatus('info', '⏳ Confirm the transfer in MetaMask...');
+      const adapter = await getAppKitAdapter();
+      const result  = await kit.send({
+        from: { adapter, chain: 'Arc_Testnet' },
+        to, amount, token: 'USDC',
+      });
+      const hash = result?.transactionHash || result?.hash;
+      akShowStatus('success', `✅ ${amount} USDC sent via App Kit!` + (hash ? `<br><a href="${ARC_EXPLORER}/tx/${hash}" target="_blank">View on ArcScan ↗</a>` : ''));
+    } catch (e) {
+      akShowStatus('error', '❌ ' + (e?.message || 'Send failed').slice(0, 140));
+    } finally {
+      btn.disabled = false;
+    }
+  };
+</script>
 <script>
 const ARC_CHAIN_ID  = 5042002;
 const ARC_RPC       = 'https://rpc.testnet.arc.network';
