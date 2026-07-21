@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeerPay</title>
+  <!-- Taruh setelah <meta name="viewport" ...> -->
+<meta http-equiv="Content-Security-Policy" 
+  content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://esm.sh;
+           connect-src 'self' https://*.circle.com https://teerpay-circle-backend.teerpay.workers.dev https://rpc.testnet.arc.network https://fonts.googleapis.com https://fonts.gstatic.com;
+           font-src 'self' https://fonts.gstatic.com;
+           frame-src 'self' https://*.circle.com;
+           img-src 'self' data:;">
+           <title>TeerPay</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTg0IDE5ODQiPgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTk4NCIgaGVpZ2h0PSIxOTg0IiByeD0iMjIwIiBmaWxsPSJibGFjayIvPgo8cG9seWdvbiBwb2ludHM9IjM3MCw3NTkgMTAxNSwxMzQyIDM2OCwxMzQzIDM2OCwxNTI3IDE1NTAsMTUyNyAxNTUwLDEzNDMgMTI5MSwxMzQzIDY0NSw3NTkiIGZpbGw9IndoaXRlIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDMzLDQ1NSA0MzMsNjM5IDY5Miw2NDAgMTMzOSwxMjI0IDE2MTMsMTIyNCA5NjcsNjQwIDE2MTQsNjM5IDE2MTQsNDU1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Poppins:wght@500&display=swap" rel="stylesheet">
