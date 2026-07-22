@@ -776,21 +776,21 @@
 
 <!-- Circle Wallet — real login flow (needs backend, see circle-wallet-backend/README.md) -->
 <script type="module">
-  let W3SSdk;
-  try {
-    const mod = await import('https://esm.sh/@circle-fin/w3s-pw-web-sdk');
-    W3SSdk = mod.W3SSdk;
-  } catch (e) {
-    console.error('[TeerPay] W3S SDK load failed:', e);
-    window.startCircleWalletLogin = () => {
-      const b = document.getElementById('cwStatus');
-      b.style.display = 'block';
-      b.style.background = '#fee2e2';
-      b.style.color = '#b91c1c';
-      b.style.border = '1px solid #fca5a5';
-      b.innerHTML = '❌ Circle SDK failed to load. Check your browser console.';
-    };
-  }
+  let W3SSdk = null;
+
+  import('https://esm.sh/@circle-fin/w3s-pw-web-sdk')
+    .then((mod) => { W3SSdk = mod.W3SSdk; })
+    .catch((e) => {
+      console.error('[TeerPay] W3S SDK load failed:', e);
+      window.startCircleWalletLogin = () => {
+        const b = document.getElementById('cwStatus');
+        b.style.display = 'block';
+        b.style.background = '#fee2e2';
+        b.style.color = '#b91c1c';
+        b.style.border = '1px solid #fca5a5';
+        b.innerHTML = '❌ Circle SDK failed to load. Check your browser console.';
+      };
+    });
 
   // Fill this in after deploying circle-wallet-backend (see its README.md).
   // Example: 'https://teerpay-circle-backend.yoursubdomain.workers.dev'
