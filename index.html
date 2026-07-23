@@ -1,15 +1,1055 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TeerPay</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/teerpay-web/assets/index-BJeq06jQ.js"></script>
-    <link rel="stylesheet" crossorigin href="/teerpay-web/assets/index-BlegDQdZ.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Taruh setelah <meta name="viewport" ...> -->
+<meta http-equiv="Content-Security-Policy" 
+  content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://esm.sh https://*.esm.sh;
+           connect-src 'self' https://*.circle.com https://teerpay-circle-backend.teerpay.workers.dev https://rpc.testnet.arc.network https://fonts.googleapis.com https://fonts.gstatic.com https://esm.sh https://*.esm.sh https://*.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com;
+           style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+           font-src 'self' data: https://fonts.gstatic.com;
+           frame-src 'self' https://*.circle.com blob:;
+           worker-src 'self' blob:;
+           img-src 'self' data: blob:;">
+           <title>TeerPay</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTg0IDE5ODQiPgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTk4NCIgaGVpZ2h0PSIxOTg0IiByeD0iMjIwIiBmaWxsPSJibGFjayIvPgo8cG9seWdvbiBwb2ludHM9IjM3MCw3NTkgMTAxNSwxMzQyIDM2OCwxMzQzIDM2OCwxNTI3IDE1NTAsMTUyNyAxNTUwLDEzNDMgMTI5MSwxMzQzIDY0NSw3NTkiIGZpbGw9IndoaXRlIi8+Cjxwb2x5Z29uIHBvaW50cz0iNDMzLDQ1NSA0MzMsNjM5IDY5Miw2NDAgMTMzOSwxMjI0IDE2MTMsMTIyNCA5NjcsNjQwIDE2MTQsNjM5IDE2MTQsNDU1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=Poppins:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f0f7ff;
+      --bg2:       #e8f4ff;
+      --surface:   rgba(255,255,255,0.85);
+      --surface2:  #f0f7ff;
+      --surface3:  #e0eefb;
+      --border:    #bfdbfe;
+      --border2:   #93c5fd;
+      --accent:    #2563eb;
+      --accent2:   #0ea5e9;
+      --accentg:   linear-gradient(135deg,#2563eb,#0ea5e9);
+      --green:     #16a34a;
+      --green-bg:  rgba(22,163,74,0.1);
+      --amber:     #d97706;
+      --red:       #dc2626;
+      --text:      #1e293b;
+      --text2:     #64748b;
+      --text3:     #94a3b8;
+      --mono:      'DM Mono', monospace;
+      --head:      'Syne', sans-serif;
+      --body:      'Inter', sans-serif;
+      --r:         10px;
+      --r2:        14px;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ffffff 0%, #e8f4ff 50%, #dbeeff 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .font-poppins { font-family: 'Poppins', sans-serif !important; font-weight: 500 !important; }
+    .logo-text { font-family: var(--head); font-size: 1.15rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+    .logo-text span { color: var(--accent); }
+    .nav-center { display: flex; gap: 2rem; }
+    .nav-link { font-size: 13px; color: var(--text2); text-decoration: none; cursor: pointer; transition: color .15s; }
+    .nav-link:hover, .nav-link.active { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .badge-net {
+      font-size: 11px; font-weight: 500; font-family: var(--mono);
+      background: #dbeafe; color: var(--accent);
+      border: 1px solid #93c5fd;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    #connectBtn {
+      background: var(--accentg); color: #fff; border: none;
+      padding: 7px 16px; border-radius: var(--r);
+      font-family: var(--body); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: opacity .15s;
+    }
+    #connectBtn:hover { opacity: .85; }
+    #walletInfo {
+      display: none; align-items: center; gap: 8px;
+      background: #fff; border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: var(--r); font-size: 13px; font-family: var(--mono);
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+
+    /* WALLET MODAL */
+    #walletModalOverlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,23,42,0.45); backdrop-filter: blur(3px);
+      align-items: center; justify-content: center;
+    }
+    #walletModalOverlay.open { display: flex; }
+    #walletModal {
+      width: 360px; max-width: 90vw; background: #fff;
+      border: 1px solid var(--border); border-radius: var(--r2);
+      box-shadow: 0 20px 60px rgba(15,23,42,0.25);
+      overflow: hidden;
+    }
+    .wm-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+    }
+    .wm-title { font-family: var(--head); font-size: 15px; font-weight: 700; color: var(--text); }
+    .wm-close { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text3); }
+    .wm-close:hover { color: var(--text); }
+    .wm-body { padding: 16px 18px 20px; }
+    .wm-option {
+      width: 100%; display: flex; align-items: center; gap: 12px;
+      background: #f8fafc; border: 1px solid var(--border); border-radius: var(--r);
+      padding: 12px 14px; margin-bottom: 10px; cursor: pointer;
+      font-family: var(--body); text-align: left; transition: border-color .15s, background .15s;
+    }
+    .wm-option:hover { border-color: var(--border2); background: #eef6ff; }
+    .wm-option svg { flex-shrink: 0; }
+    .wm-option-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .wm-option-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .wm-note { font-size: 11px; color: var(--text3); text-align: center; margin-top: 6px; line-height: 1.5; }
+    @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+
+    /* HERO */
+    .hero {
+      max-width: 760px; margin: 0 auto; padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 1.5rem;
+      border: 1px solid #93c5fd; padding: 4px 12px; border-radius: 20px;
+      background: #dbeafe;
+    }
+    .hero h1 {
+      font-family: var(--head); font-size: clamp(2.4rem,5vw,3.8rem);
+      font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
+      margin-bottom: 1.25rem; color: var(--text);
+    }
+    .hero h1 .grad {
+      background: var(--accentg); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { color: var(--text2); font-size: 1rem; max-width: 440px; margin: 0 auto 2rem; line-height: 1.7; }
+    .hero-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .pill {
+      font-size: 12px; color: var(--text2);
+      background: rgba(255,255,255,0.8); border: 1px solid var(--border);
+      padding: 5px 14px; border-radius: 20px;
+    }
+    .pill strong { color: var(--text); }
+
+    /* STATS */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      border-radius: var(--r2); overflow: hidden;
+      max-width: 900px; margin: 0 auto 3rem;
+    }
+    .stat-cell { background: rgba(255,255,255,0.85); padding: 1.25rem 1.5rem; }
+    .stat-cell-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; }
+    .stat-cell-val { font-family: var(--head); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+    .stat-cell-val.blue { color: var(--accent); }
+    .stat-cell-val.green { color: var(--green); }
+    .stat-cell-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+    /* MAIN GRID */
+    .app-grid {
+      display: grid; grid-template-columns: 420px 1fr;
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    /* PANEL */
+    .panel {
+      background: rgba(255,255,255,0.85); border: 1px solid var(--border);
+      border-radius: var(--r2); overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    .panel-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .panel-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #dbeafe;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .panel-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .panel-body { padding: 1.25rem; }
+
+    /* CORRIDORS */
+    .corridor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+    .corridor-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: #f0f7ff; border: 1px solid var(--border);
+      border-radius: var(--r); padding: 9px 11px;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      text-align: left;
+    }
+    .corridor-btn:hover { border-color: var(--border2); background: #e0eefb; }
+    .corridor-btn.active { border-color: var(--accent); background: #dbeafe; }
+    .corridor-flag { font-size: 1.3rem; flex-shrink: 0; }
+    .corridor-info { min-width: 0; }
+    .corridor-country { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .corridor-currency { font-size: 10px; color: var(--accent); font-family: var(--mono); }
+
+    /* FORM */
+    .form-row { margin-bottom: 1rem; }
+    .form-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; display: block; }
+    .input-wrap { position: relative; }
+    .form-input {
+      width: 100%; background: #f0f7ff; border: 1px solid var(--border);
+      color: var(--text); padding: 10px 12px; border-radius: var(--r);
+      font-family: var(--body); font-size: 14px; outline: none;
+      transition: border-color .15s;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .input-suffix {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--accent2);
+    }
+    .to-addr {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text3); background: #f0f7ff;
+      border: 1px solid var(--border); border-radius: var(--r);
+      padding: 8px 12px; margin-bottom: 1rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .send-btn {
+      width: 100%; padding: 13px;
+      background: var(--accentg); color: #fff; border: none;
+      border-radius: var(--r); font-family: var(--head); font-size: 15px;
+      font-weight: 700; letter-spacing: -0.01em;
+      cursor: pointer; transition: opacity .15s; margin-top: 4px;
+    }
+    .send-btn:hover { opacity: .88; }
+    .send-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* STATUS */
+    #statusBox, #akStatusBox, #cwSendStatusBox {
+      display: none; margin-top: .85rem; padding: 11px 14px;
+      border-radius: var(--r); font-size: 13px; line-height: 1.5;
+    }
+    #statusBox.info, #akStatusBox.info, #cwSendStatusBox.info       { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+    #statusBox.success, #akStatusBox.success, #cwSendStatusBox.success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+    #statusBox.error, #akStatusBox.error, #cwSendStatusBox.error     { background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; }
+    #statusBox a, #akStatusBox a, #cwSendStatusBox a { color: inherit; text-decoration: underline; }
+
+    /* RIGHT COLUMN */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* CONTRACT CARD */
+    .info-table { width: 100%; }
+    .info-tr { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .info-tr:last-child { border-bottom: none; }
+    .info-key { font-size: 12px; color: var(--text3); }
+    .info-val { font-size: 12px; font-weight: 500; color: var(--text); }
+    .info-val.mono { font-family: var(--mono); color: var(--accent); font-size: 11px; }
+    .info-val.green { color: var(--green); }
+    .badge-verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; background: var(--green-bg); color: var(--green);
+      border: 1px solid rgba(22,163,74,.2); padding: 2px 8px; border-radius: 20px;
+    }
+    .copy-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 11px; margin-left: 6px; font-family: var(--mono); }
+    .copy-btn:hover { color: var(--accent); }
+
+    /* TX LIST */
+    .tx-empty { text-align: center; padding: 2rem 1rem; color: var(--text3); font-size: 13px; }
+    .tx-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-flag { font-size: 1.3rem; flex-shrink: 0; }
+    .tx-mid { flex: 1; min-width: 0; }
+    .tx-country { font-size: 13px; font-weight: 600; color: var(--text); }
+    .tx-memo { font-size: 11px; color: var(--text3); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-right { text-align: right; flex-shrink: 0; }
+    .tx-amount { font-size: 13px; font-weight: 600; color: var(--accent2); font-family: var(--mono); }
+    .tx-link { font-size: 11px; color: var(--text3); text-decoration: none; }
+    .tx-link:hover { color: var(--accent); }
+
+    /* FLOW STEPS */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step { display: flex; gap: 12px; padding: 12px 0; position: relative; }
+    .step:not(:last-child)::after { content:''; position: absolute; left: 15px; top: 36px; bottom: 0; width: 1px; background: var(--border); }
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: #f0f7ff; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--text2); z-index: 1;
+    }
+    .step-num.done { background: var(--green-bg); border-color: rgba(22,163,74,.3); color: var(--green); }
+    .step-content { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .step-desc { font-size: 12px; color: var(--text3); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem;
+      text-align: center; color: var(--text3); font-size: 12px;
+      background: rgba(255,255,255,0.6);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 820px) {
+      .app-grid { grid-template-columns: 1fr; padding: 0 1rem 3rem; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .nav-center { display: none; }
+      nav { padding: 0 1rem; }
+      .hero { padding: 3rem 1rem 2rem; }
+    }
+  </style>
+  <script type="module" crossorigin src="/teerpay-web/assets/index-BaED0_xv.js"></script>
+</head>
+<body>
+
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 1984 1984" fill="none">
+        <polygon points="370,759 1015,1342 368,1343 368,1527 1550,1527 1550,1343 1291,1343 645,759" fill="white"/>
+        <polygon points="433,455 433,639 692,640 1339,1224 1613,1224 967,640 1614,639 1614,455" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-text font-poppins">Teer<span>Pay</span></span>
+  </div>
+  <div class="nav-center">
+    <span class="nav-link active">Send</span>
+    <span class="nav-link" onclick="scrollToHistory()">History</span>
+    <span class="nav-link" onclick="scrollToContract()">Contract</span>
+  </div>
+  <div class="nav-right">
+    <span class="badge-net">Arc Testnet · 5042002</span>
+    <button id="connectBtn" onclick="openWalletModal()">Connect wallet</button>
+    <div id="walletInfo">
+      <div class="live-dot"></div>
+      <span id="walletAddr">—</span>
+      <span style="color:var(--accent2);margin-left:4px;" id="walletBal">—</span>
+      <button id="logoutBtn" onclick="disconnectWallet()" title="Log out" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;margin-left:6px;padding:0 2px;line-height:1;">✕</button>
+    </div>
+  </div>
+</nav>
+
+<!-- WALLET SELECTOR MODAL -->
+<div id="walletModalOverlay" onclick="if(event.target===this) closeWalletModal()">
+  <div id="walletModal">
+    <div class="wm-header">
+      <span class="wm-title">Connect a wallet</span>
+      <button class="wm-close" onclick="closeWalletModal()">✕</button>
+    </div>
+    <div class="wm-body">
+      <button class="wm-option" onclick="connectWallet()">
+        <svg width="30" height="30" viewBox="-973.94 74.64 753.5 722.6" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FE8C60" d="M-526.641,224.163c1.342,0.017,2.683,0.028,4.024,0.039c2.354,1.142,3.645,3.248,4.92,5.374c5.934,13.218,4.992,27.645,6.411,41.5c1.663,16.242,4.196,32.544,3.249,49.002c1.654,3.672,2.286,7.55,2.331,11.552c-9.196,45.181-14.094,91.063-21.924,136.476c-5.849,37.548-11.808,75.075-17.284,112.659c-2.511,6.514-4.564,12.857-4.412,20.299c0.271,13.266-5.455,25.521-7.958,34.666c2.757-13.668,10.236-29.629,14.615-46.586c6.336-13.44,7.938-29.455,21.203-39.133c28.393-11.559,58.631-16.182,88.155-23.46c12.14-4.39,24.953-6.303,37.301-9.961c4.368-1.292,9.191-1.555,12.121-5.817c3.916-5.048,2.114-10.846,2.12-16.355c0.028-18.762-0.078-37.522,0.155-56.284c0.119-9.581,2.675-17.539,11.616-22.392c29.914-3.531,59.9-1.682,89.867-1.145c5.715,0.1,9.701,3.016,12.021,8.223c14.726,55.5,29.46,110.999,44.169,166.507c1.084,4.094,1.999,8.231,2.991,12.351c-0.92,11.511-8.924,10.618-17.29,10.507c-62.697-0.834-125.4-1.347-188.059,0.23c-9.695-0.214-14.435,7.979-20.868,12.93c-27.514,21.155-54.809,42.595-83.135,62.672c-3.459,2.135-5.906,5.693-9.892,7.102c-1.364,0.271-2.727,0.219-4.083-0.062c-3.914-1.635-8.154-3.364-10.194-7.114c-7.167-13.18-18.714-15.574-32.229-14.333c-5.571,0.511-11.26,0.496-16.836,0.018c-14.786-1.272-28.093,0.244-36.079,15.232c-1.767,3.318-5.662,4.773-9.171,6.211c-1.371,0.333-2.744,0.357-4.131,0.128c-4.158-1.25-6.083-5.524-9.87-7.286c-31.737-22.227-62.114-46.287-93.165-69.436c-3.992-2.977-8.118-4.302-12.532-5.729c-25.477-2.504-50.978-0.852-76.445-1.093c-36.817-0.349-73.643,0.267-110.455-0.366c-6.667-0.113-16.227,2.703-17.186-9.171c15.127-56.91,30.262-113.817,45.365-170.736c0.724-2.724,1.173-5.521,1.749-8.287c2.92-7.378,9.152-8.841,16.085-8.908c27.284-0.258,54.574-1.192,81.832,0.626c12.227,3.537,17.076,11.458,16.405,24.318c-1.058,20.277,0.072,40.624-0.61,60.929c-0.13,3.883,0.018,7.545,2.486,10.727c8.397,7.705,19.79,6.885,29.685,10.299c5.652,1.952,11.809,2.384,17.184,5.344c15.523,2.866,30.884,6.406,46.13,10.422c14.842,3.908,30.272,5.898,44.083,13.26c4.843,1.458,7.482,5.183,9.695,9.346c2.258,11.603,6.478,22.439,11.99,32.966c6.812,13.008,10.983,27.054,13.104,38.154c-9.295-19.052-4.508-44.413-13.499-67.004c-5.021-32.171-10.108-64.306-14.411-96.562c-8.149-45.424-14.311-91.154-21.148-136.789c-0.481-2.508-0.583-4.994,0.387-7.422c2.19-28.77,4.475-57.522,7.188-86.259c2.774-10.139,9.205-13.742,19.805-13.498C-614.933,224.069-570.771,222.035-526.641,224.163z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#661801" d="M-510.889,329.868c-2.921-1.774-3.218-3.803-0.607-6.125c1.189-8.509,6.89-14.074,12.58-19.795c51.381-51.647,99.308-106.617,151.579-157.407c3.071-2.982,5.252-6.61,7.791-9.989c18.725-13.764,31.272-33.97,49.984-47.895c4.706-3.503,10.979-5.887,13.687-11.923c8.151-5.565,8.159,1.63,9.349,6.197c7.358,28.249,14.493,56.556,21.852,84.804c6.646,25.521,12.844,51.187,20.485,76.411c4.313,14.247,3.7,27.146-1.037,41.187c-15.341,45.494-30.316,91.132-42.88,137.496c-34.219-3.304-68.493-1.303-102.747-1.164c-8.299,2.96-15.383,0.609-22.343-4.308c-33.293-23.539-66.639-47.007-100.879-69.158C-501.311,343.521-505.784,336.431-510.889,329.868z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#661801" d="M-824.565,421.621c-33.637,0.091-67.314-2.495-100.893,1.48c-11.973-46.109-27.117-91.245-42.057-136.426c-4.576-13.842-5.642-26.436-1.587-41.051c14.854-53.551,27.954-107.587,42.043-161.351c1.048-3.997-0.308-13.814,9.685-7.655c2.425,6.807,9.276,9.119,14.292,12.763c18.642,13.551,30.982,33.495,49.342,47.195c2.78,3.778,5.337,7.719,8.804,10.979c34.312,32.251,64.984,68.033,98.205,101.359c19.568,19.634,37.363,41.037,57.497,60.169c4.399,4.182,5.977,9.404,7.273,14.931c-0.124,1.913-0.245,3.831-0.369,5.746c-3.603,8.673-10.642,14.269-18.088,19.169c-32.667,21.5-64.941,43.567-96.583,66.539C-805.49,421.629-814.2,424.827-824.565,421.621z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E24806" d="M-432.175,607.689c4.216-2.924,9.063-2.245,13.723-2.234c61.83,0.117,123.659,0.36,185.489,0.338c4.155,0,9.845,2.406,12.001-4.146c2.552,13.721-4.964,25.333-8.39,37.629c-11.247,40.383-23.841,80.386-35.499,120.654c-2.431,8.393-5.992,11.907-14.978,9.175c-50.466-15.353-101.004-30.472-151.52-45.671c-1.45-0.943-2.622-2.157-3.515-3.631c-3.553-5.965-3.188-12.709-3.37-19.197c-0.688-24.418-0.366-48.848-0.241-73.271C-438.438,620.123-437.23,613.288-432.175,607.689z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E24806" d="M-972.569,602.118c2.923,5.917,8.186,3.144,12.507,3.154c61.285,0.113,122.571,0.08,183.856,0.177c5.1,0.009,10.444-0.914,15.115,2.257c4.946,8.298,6.723,17.325,6.457,26.901c-0.703,25.208,1.922,50.516-2.299,75.597c0.716,7.891-5,10.896-10.656,13.949c-20.813,10.169-43.806,13.451-65.581,20.621c-25.929,8.54-52.289,15.771-78.428,23.676c-7.4,2.236-13.359,3.21-16.261-6.741c-14.76-50.618-29.945-101.111-44.916-151.67C-973.533,607.473-975.057,604.688-972.569,602.118z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E7E9F4" d="M-653.378,691.77c0.895,0.191,1.8,0.277,2.715,0.261c10.259,2.55,10.655,11.686,13.047,19.504c2.048,6.699,2.842,13.606,3.54,20.546c2.547,16.678,1.502,33.427,1.028,50.15c-0.146,5.133-0.661,10.377-6.192,13.099c-41.369-21.579-80.65-46.702-120.438-70.965c-0.271-7.018,5.679-8.437,10.162-9.739c23.171-6.741,46.504-12.928,69.467-20.383C-671.176,693.261-662.693,688.012-653.378,691.77z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E6EAF3" d="M-542.672,691.892c0.923,0.095,1.838,0.05,2.744-0.133c12.896-2.722,24.648,2.431,36.553,5.743c6.732,1.873,13.106,4.905,20.346,4.023c11.652,3.221,23.698,5.396,34.03,12.314c2.37,5.209,8.271,9.194,5.749,16.156c-36.384,22.672-72.634,45.577-110.783,65.253c-5.532-2.729-6.042-7.982-6.186-13.124c-0.463-16.746-1.53-33.515,1.036-50.188c0.666-9.856,2.761-19.46,5.807-28.819C-551.657,697.84-549.947,692.083-542.672,691.892z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#C0C3CB" d="M-554.021,729.891c-0.006,21.785-0.006,43.57-0.011,65.358c-28.398,2.764-56.802,2.52-85.208,0.08c-0.004-21.818-0.008-43.64-0.012-65.458c3.025-5.053,8-6.022,13.268-6.219c19.567-0.734,39.136-0.74,58.703,0.002C-562.015,723.854-557.037,724.83-554.021,729.891z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DC6136" d="M-858.259,140.648c-20.212-20.876-42.901-39.462-59.115-64.03c44.105,26.064,88.25,52.06,132.303,78.213c33.613,19.956,67.221,39.925,100.584,60.297c9.201,5.616,18.49,8.132,29.304,8.01c37.734-0.43,75.478-0.194,113.219-0.089c5.122,0.014,10.241,0.729,15.344,1.117c-42.373,0.299-84.732,1.125-127.074,0.557c-11.619-0.155-17.406,3.351-19.057,14.407c-59.913-42.794-127.019-73.903-187.241-114.962C-856.932,128.96-851.146,133.979-858.259,140.648z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DE5F35" d="M-275.876,76.734c-16.367,24.407-38.964,43.046-59.164,63.909c-6.71-5.477-1.544-10.565,0.288-15.1c-10.485,6.923-19.784,18.625-35.499,11.513c-0.593-1.319-0.427-2.544,0.488-3.664C-339.596,112.638-307.406,95.232-275.876,76.734z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DC6136" d="M-369.763,133.392c0.058,1.034,0.116,2.071,0.177,3.104c-3.342,15.139-17.805,17.802-28.104,25.161c-7.006,1.591-13.924,3.314-16.932,11.086c-23.19,13.345-44.742,29.485-69.119,40.837c-8.154,3.797-15.097,9.609-22.999,13.853c-5.02,2.694-9.692,6.23-15.701,2.705c-0.061-1.979-0.122-3.958-0.178-5.937C-472.369,192.75-421.836,161.773-369.763,133.392z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E56929" d="M-678.877,698.395c-26.933,8.658-53.864,17.316-80.799,25.976c-2.639-0.078-5.274-0.147-7.912-0.217c0.41-4.163,4.045-5.937,6.398-8.661c3.065-12.17,10.822-14.873,22.394-12.176c6.953,1.619,14.798,0.555,19.924-4.54c9.705-9.64,22.856-6.924,34.043-10.986c3.908-1.419,8.35,0.238,11.497,3.664C-670.503,697.496-676.528,696.477-678.877,698.395z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#EECFBB" d="M-443.25,729.996c-2.844-3.886-5.693-7.766-8.537-11.652c7.356-7.067,13.435-4.301,18.986,2.479c0.482,0.87,0.964,1.74,1.446,2.611C-435.31,725.628-438.353,729.492-443.25,729.996z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FD5C16" d="M-824.565,421.621c12.444-1.497,21.041-10.233,30.669-16.763c33.639-22.797,66.969-46.054,100.485-69.033c3.459-2.37,7.382-4.066,11.085-6.07c10.176,32.542,11.551,66.627,17.472,99.913c2.142,12.042,3.699,24.193,5.521,36.294c-4.476,6.289-11.21,6.226-17.864,6.303c-20.782,0.241-41.578,0.51-62.342-0.044c-13.664-0.363-24.071,4.207-34.279,13.417c-13.122,11.844-24.532,26.064-41.173,33.682c-4.765-5.743-3.047-12.636-3.06-19.069c-0.043-22.195,0.036-44.396,0.646-66.577C-817.236,427.541-819.004,423.76-824.565,421.621z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FD5C15" d="M-510.889,329.868c31.741,18.431,60.749,40.957,91.373,61.054c16.04,10.526,30.294,23.944,48.679,30.743c-5.799,5.08-4.258,12.037-4.318,18.349c-0.2,21.108,0.083,42.22,0,63.329c-0.022,5.51,1.131,11.363-2.999,16.161c-15.593-7.426-27.295-19.997-39.174-31.755c-11.347-11.233-23.381-16.203-39.147-15.576c-19.822,0.79-39.706,0.327-59.563,0.091c-6.654-0.08-13.403,0.009-17.877-6.305c5.532-36.34,11.68-72.604,16.187-109.073C-516.549,347.324-512.264,339.075-510.889,329.868z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FA5D18" d="M-400.598,156.651c10.339-6.718,20.674-13.434,31.012-20.152c12.68-4.05,24.518-9.199,34.18-19.105c3.348-3.431,10.072-9.022,14.726-3.462c4.229,5.053-2.963,8.808-6.131,12.503c-3.65,4.257-8.653,7.619-8.229,14.202c-30.073,31.896-60.056,63.875-90.25,95.655c-25.022,26.336-50.244,52.481-75.505,78.593c-3.198,3.307-5.66,7.705-10.704,8.861c-5.981-22.875-4.665-46.63-8.393-69.788c-1.264-7.868-1.727-15.87-2.553-23.813c34.903-20.704,69.801-41.403,104.699-62.102C-411.914,164.417-406.349,160.391-400.598,156.651z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FB5D16" d="M-858.259,140.648c-0.069-9.983-9.211-13.625-14.139-20.211c-1.385-1.851-3.617-3.573-2.262-6.15c1.623-3.091,4.732-3.096,7.375-1.882c4.256,1.954,8.618,3.989,12.312,6.805c24.259,18.5,51.776,31.849,77.267,48.448c27.229,17.73,56.778,32.148,84.542,49.46c9.368,5.842,20.093,8.525,20.409,22.012c-2.497,28.354-2.608,56.974-9.206,84.884c-25.348-21.962-47.089-47.473-70.199-71.625C-787.667,215.277-822.907,177.907-858.259,140.648z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E24807" d="M-533.916,465.959c29.712-0.022,59.424,0.05,89.136-0.128c7.85-0.044,14.917,1.38,20.893,6.862c13.848,12.7,27.899,25.181,41.569,38.071c2.189,2.065,2.816,5.787,4.163,8.742c-17.747,4.021-35.494,8.046-53.243,12.07c-6.164-1.194-12.073-3.257-16.062-8.273c-12.154-15.288-28.809-11.272-44.577-10.549c-6.034,0.277-8.282,5.485-10.26,10.488c-4.335,10.976-8.767,21.918-17.545,30.338c-7.874,11.397-10.277,25.283-16.924,37.24c-2.455,3.464-3.159,9.795-9.634,7.267c-7.883-3.07-3.215-10.554-4.861-15.864C-547.425,543.177-539.676,504.717-533.916,465.959z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#E24807" d="M-814.991,519.318c0.302-8.439,7.969-11.226,12.771-15.971c11.023-10.887,22.632-21.187,34.086-31.635c5.603-5.111,12.517-5.898,19.785-5.868c29.672,0.136,59.345,0.092,89.017,0.116c4.921,32.955,9.845,65.91,14.767,98.867c-0.404,7.833,3.867,19.318-6.032,21.561c-10.369,2.348-8.538-10.906-12.695-16.843c-1.583-2.262-2.827-4.828-4.406-7.146c-1.87-2.977-3.74-5.953-5.61-8.93c-10.001-7.498-13.079-19.164-17.33-29.896c-3.251-8.207-8.347-11.427-16.949-11.624c-15.24-0.35-30.136-0.804-40.634,13.326c-3.737,5.03-10.152,4.091-15.47,5.523C-781.31,529.299-797.733,522.444-814.991,519.318z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FC5D17" d="M-432.801,720.822c-6.331-0.826-12.658-1.652-18.986-2.479c-10.465-3.642-20.926-7.286-31.392-10.931c-13.201-7.996-29.496-6.574-42.905-14.146c-3.886-2.195-9.423-2.253-8.143-8.931c33.401-26.369,66.863-52.655,102.052-76.646c1.239,34.606-1.699,69.285,1.71,103.87C-430.154,714.702-430.218,718.194-432.801,720.822z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#651905" d="M-554.021,729.891c-28.409-0.005-56.821-0.011-85.231-0.02c-3.803-12.607-7.604-25.219-11.408-37.832c11.446-20.275,27.799-30.716,51.805-25.94c1.355,0.271,2.863,0.283,4.213,0c24.113-5.036,40.191,6.025,51.968,25.796C-546.455,704.559-550.241,717.225-554.021,729.891z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#FC5D17" d="M-673.347,692.801c-14.479,3.396-30.089,2.007-42.842,12.6c-6.527,5.422-16.668,8.221-24.075,4.923c-9.72-4.329-14.968-0.552-20.926,5.172c0.033-35.932,0.065-71.857,0.099-107.789c34.749,24.562,69.011,49.768,101.942,76.744C-657.34,698.355-667.605,691.73-673.347,692.801z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#6D1703" d="M-763.689,530.801c2.721-2.558,6.068-4.709,8.064-7.746c14.634-22.279,37.094-17.551,58.296-17.243c4.688,0.069,8.35,2.171,9.714,6.688c4.189,13.866,12.662,26.228,14.304,40.971C-703.647,546.76-734.038,540.252-763.689,530.801z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#6C1704" d="M-519.842,553.581c1.114-15.51,10.701-28.049,14.956-42.473c0.82-2.777,3.29-5.006,6.336-4.967c20.973,0.261,44.063-7.395,59.097,15.627c2.301,3.52,5.35,6.552,8.055,9.809C-460.878,538.914-490.359,546.247-519.842,553.581z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DA5018" d="M-667.698,562.4c5.737,3.188,7.363,9.232,10.084,14.518c1.411,2.744,1.833,7.052,6.002,6.47c4.088-0.571,3.458-4.823,4.212-7.839c0.896-3.586,1.883-7.147,2.834-10.721c7.101,28.682,9.383,58.061,14.841,86.98c-1.365,0.359-2.731,0.721-4.098,1.08C-645.114,622.723-656.406,592.562-667.698,562.4z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#D9531B" d="M-551.261,582.224c4.711,3.067,0.501,21.167,14.495,8.598c-5.293,21.458-15.463,40.998-24.257,61.303C-560.363,628.36-556.571,605.189-551.261,582.224z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DD7642" d="M-534.227,684.336c10.737,7.844,22.013,14.401,35.879,14.341c6.832-0.028,11.428,3.542,15.169,8.736c-19.521-3.011-38.088-9.493-56.746-15.651C-539.11,688.455-537.544,685.722-534.227,684.336z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DF7644" d="M-673.347,692.801c4.183-3.72,12.734-0.011,14.198-8.351c3.258,1.388,5.039,3.94,5.769,7.322c-8.288,3.021-16.422,6.633-25.5,6.622C-677.034,696.528-675.189,694.663-673.347,692.801z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" fill="#DE5F35" d="M-400.598,156.651c-4.315,5.904-8.908,11.392-17.147,11.389C-414.054,161.194-408.083,157.777-400.598,156.651z"/>
+        </svg>
+        <div class="wm-option-text">
+          <div class="wm-option-title">MetaMask</div>
+          <div class="wm-option-sub">Connect using browser extension</div>
+        </div>
+      </button>
+
+      <button class="wm-option" onclick="openCircleWalletFlow()">
+        <svg width="30" height="30" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient x1="80.1491883%" y1="20.5698831%" x2="0%" y2="94.4792036%" id="tp-cw-g1">
+              <stop stop-color="#5FBFFF" offset="0%"></stop>
+              <stop stop-color="#B090F5" offset="100%"></stop>
+            </linearGradient>
+            <linearGradient x1="0%" y1="94.0951088%" x2="112.081307%" y2="-8.91022163%" id="tp-cw-g2">
+              <stop stop-color="#68D7FA" offset="0%"></stop>
+              <stop stop-color="#7EF1B3" offset="100%"></stop>
+            </linearGradient>
+          </defs>
+          <g fill="none" fill-rule="evenodd">
+            <path d="M105.157896,25.0405872 L99.1946494,30.9873028 C98.2921039,31.8874128 98.1631688,33.2908624 98.8625974,34.3556697 C101.046987,37.6844037 102.78761,41.2676697 104.052234,45.0182752 L104.06813,45.0028624 C105.683792,49.789211 106.519662,54.8393394 106.519662,59.9383486 C106.519662,85.6971743 85.5067792,106.652917 59.6787013,106.652917 C51.9059481,106.652917 44.4396364,104.791046 37.7257403,101.217908 L47.8321299,91.1392294 C51.603039,92.5651376 55.6216623,93.3058349 59.6787013,93.3058349 C78.1274545,93.3058349 93.1364675,78.3373211 93.1364675,59.9383486 C93.1364675,58.7889908 93.0671429,57.6361101 92.9461558,56.4863119 C92.5438961,52.6185688 91.4722338,48.868844 89.7894545,45.3978716 C88.9858182,43.7407706 86.7842078,43.3638165 85.478961,44.6659817 L79.4260779,50.7029725 C78.7716883,51.355156 78.5014545,52.2988624 78.7120779,53.1976514 L79.2198701,55.3651376 C79.574,56.8764771 79.7532727,58.4155596 79.7532727,59.9383486 C79.7532727,70.9779083 70.7481299,79.9587523 59.6787013,79.9587523 C56.1948052,79.9587523 52.7581558,79.0480734 49.7401039,77.3240367 L47.0770649,75.8025688 C46.0283636,75.2036697 44.7085455,75.3789358 43.8541299,76.2310459 L19.1767532,100.840514 C18.0331169,101.980624 18.1576364,103.864514 19.4408052,104.846532 L23.0757143,107.625688 C33.6616364,115.721394 46.3197922,120 59.6787013,120 C92.8861039,120 119.902416,93.0561468 119.902416,59.9383486 C119.902416,49.4827156 117.16387,39.1820917 111.982623,30.1501651 L109.373455,25.6024954 C108.869636,24.7239633 107.963117,24.2584954 107.046442,24.2584954 C106.369532,24.2584954 105.687325,24.5121468 105.157896,25.0405872" fill="url(#tp-cw-g1)"></path>
+            <path d="M60.486,0.0973211009 C27.1337739,0.0973211009 0,27.0407339 0,60.1585321 C0,70.6154862 2.7500087,80.9165505 7.95378261,89.947156 L10.5747391,94.4948257 C11.4546,96.0220183 13.5558,96.3007706 14.8086261,95.0567339 L20.796913,89.1108991 C21.7029391,88.210789 21.8319913,86.8082202 21.1308522,85.7429725 C18.9391826,82.4164404 17.1887739,78.8305321 15.9182087,75.0799266 L15.9035739,75.0944587 C14.280887,70.3081101 13.4409391,65.258422 13.4409391,60.1585321 C13.4409391,34.4005872 34.5456261,13.4439633 60.486,13.4439633 C68.2916609,13.4439633 75.7904348,15.3058349 82.5339652,18.8794128 L72.3840783,28.9580917 C68.5967739,27.5321835 64.5602348,26.7910459 60.486,26.7910459 C41.9565913,26.7910459 26.8827652,41.76 26.8827652,60.1585321 C26.8827652,60.7155963 26.9031652,61.2731009 26.9315478,61.8306055 C26.9408609,62.0115963 26.9528348,62.1917064 26.9652522,62.3722569 C26.9945217,62.8073394 27.0322174,63.242422 27.0792261,63.6770642 C27.4903304,67.5126606 28.5657652,71.2438899 30.2461043,74.6972477 C31.0523478,76.354789 33.2644174,76.7308624 34.5748957,75.4286972 L40.6523217,69.394789 C41.309113,68.7421651 41.5800783,67.7984587 41.3689826,66.9001101 L40.8589826,64.7317431 C40.5042,63.2221651 40.3241478,61.6839633 40.3241478,60.1585321 C40.3241478,49.1194128 49.3684435,40.1381284 60.486,40.1381284 C63.9846,40.1381284 67.4357478,41.0492477 70.4660348,42.772844 L73.1419826,44.2951927 C74.1948,44.8945321 75.5208,44.7183853 76.3793739,43.8667156 L101.163157,19.2568073 C102.311765,18.1158165 102.187148,16.232367 100.8984,15.250789 L97.2472435,12.471633 C86.6144087,4.37636697 73.9021043,0.0973211009 60.486,0.0973211009 Z" fill="url(#tp-cw-g2)"></path>
+          </g>
+        </svg>
+        <div class="wm-option-text">
+          <div class="wm-option-title">Circle Wallet</div>
+          <div class="wm-option-sub">Email login, no extension needed</div>
+        </div>
+      </button>
+
+      <div id="cwFlow" style="display:none;">
+        <div class="form-row" style="margin-top:14px;">
+          <label class="form-label" for="cwEmail">Email address</label>
+          <input class="form-input" type="email" id="cwEmail" placeholder="you@example.com" />
+        </div>
+        <button class="send-btn" id="cwContinueBtn" onclick="startCircleWalletLogin()">Continue with email</button>
+        <div id="cwStatus" style="display:none;margin-top:10px;padding:10px 12px;border-radius:var(--r);font-size:12px;line-height:1.5;"></div>
+      </div>
+
+      <p class="wm-note">By connecting, you agree this is a testnet-only environment. No real funds are involved.</p>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">⬡ Powered by Arc Testnet</div>
+  <h1 class="font-poppins">Send USDC across borders,<br><span class="grad">instantly.</span></h1>
+  <p class="hero-sub">TeerPay is a decentralized remittance protocol on Arc. No KYC, near-zero fees, every transfer stored permanently on-chain.</p>
+  <div class="hero-pills">
+    <div class="pill"><strong>~0.001 USDC</strong> per transfer</div>
+    <div class="pill"><strong>&lt; 1 sec</strong> confirmation</div>
+    <div class="pill"><strong>No KYC</strong> required</div>
+    <div class="pill"><strong>On-chain</strong> memo</div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-cell">
+    <div class="stat-cell-label">Total transfers</div>
+    <div class="stat-cell-val blue font-poppins" id="statTxCount">—</div>
+    <div class="stat-cell-sub">on-chain txns</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-cell-label">Volume sent</div>
+    <div class="stat-cell-val font-poppins" id="statVolume">—</div>
+    <div class="stat-cell-sub">USDC total</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-cell-label">Corridors</div>
+    <div class="stat-cell-val green font-poppins">5</div>
+    <div class="stat-cell-sub">countries supported</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-cell-label">Contract status</div>
+    <div class="stat-cell-val green font-poppins" id="statStatus">Active</div>
+    <div class="stat-cell-sub">verified on ArcScan</div>
+  </div>
+</div>
+
+<div class="app-grid">
+
+  <!-- LEFT: SEND -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-icon">🌏</div>
+        <span class="panel-title">Send remittance</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-row">
+          <label class="form-label">Select corridor</label>
+          <div class="corridor-grid" id="corridorGrid"></div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Recipient</label>
+          <div class="to-addr" id="toAddrDisplay">Select a corridor above</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="amountInput">Amount</label>
+          <div class="input-wrap">
+            <input class="form-input" type="number" id="amountInput" value="0.01" min="0.01" max="100" step="0.01" style="padding-right:54px;" />
+            <span class="input-suffix">USDC</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="memoInput">Memo <span style="color:var(--text3);text-transform:none;letter-spacing:0;">(optional — stored on-chain)</span></label>
+          <input class="form-input" type="text" id="memoInput" placeholder="e.g. monthly family transfer" maxlength="80" />
+        </div>
+
+        <button class="send-btn" id="sendBtn" onclick="sendRemittance()" disabled>Connect wallet to send</button>
+        <div id="statusBox"></div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-header">
+        <div class="panel-icon">⚡</div>
+        <span class="panel-title">How it works</span>
+      </div>
+      <div class="panel-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num done">1</div>
+            <div class="step-content">
+              <div class="step-title">Connect MetaMask</div>
+              <div class="step-desc">Auto-switches to Arc Testnet (Chain ID 5042002)</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num done">2</div>
+            <div class="step-content">
+              <div class="step-title">Choose corridor & amount</div>
+              <div class="step-desc">Select destination country and USDC amount</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Approve USDC (once)</div>
+              <div class="step-desc">One-time MetaMask approval for the TeerPay contract</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Confirm transfer</div>
+              <div class="step-desc">sendRemittance() emits on-chain event — confirmed in &lt;1s</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK SEND (APP KIT) -->
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-header">
+        <div class="panel-icon">🧩</div>
+        <span class="panel-title">Quick Send</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);">Powered by Circle App Kit</span>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.6;">
+          Send USDC directly to any wallet address on Arc Testnet — no corridor, no memo, no custom contract. This uses Circle's <code style="font-family:var(--mono);">@circle-fin/app-kit</code> <strong>Send</strong> capability directly.
+        </p>
+        <div class="form-row">
+          <label class="form-label" for="akToAddress">Recipient address</label>
+          <input class="form-input" type="text" id="akToAddress" placeholder="0x..." />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="akAmount">Amount</label>
+          <div class="input-wrap">
+            <input class="form-input" type="number" id="akAmount" value="1.00" min="0.01" step="0.01" style="padding-right:54px;" />
+            <span class="input-suffix">USDC</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="send-btn" id="akEstimateBtn" onclick="estimateAppKitSend()" style="background:#fff;color:var(--accent);border:1px solid var(--border);">Estimate</button>
+          <button class="send-btn" id="akSendBtn" onclick="sendViaAppKit()">Send via App Kit →</button>
+        </div>
+        <div id="akStatusBox"></div>
+      </div>
+    </div>
+
+    <!-- SEND VIA CIRCLE WALLET (shown after Circle Wallet login) -->
+    <div class="panel" id="cwSendPanel" style="margin-top:16px; display:none;">
+      <div class="panel-header">
+        <div class="panel-icon">🔵</div>
+        <span class="panel-title">Send via Circle Wallet</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);">No extension needed</span>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.6;">
+          Send USDC straight from your Circle Wallet — approve with your PIN, no browser extension required.
+        </p>
+        <div class="form-row">
+          <label class="form-label" for="cwToAddress">Recipient address</label>
+          <input class="form-input" type="text" id="cwToAddress" placeholder="0x..." />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="cwAmount">Amount</label>
+          <div class="input-wrap">
+            <input class="form-input" type="number" id="cwAmount" value="1.00" min="0.01" step="0.01" style="padding-right:54px;" />
+            <span class="input-suffix">USDC</span>
+          </div>
+        </div>
+        <button class="send-btn" id="cwSendBtn" onclick="sendViaCircleWallet()">Send via Circle Wallet →</button>
+        <div id="cwSendStatusBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- CONTRACT INFO -->
+    <div class="panel" id="contractSection">
+      <div class="panel-header">
+        <div class="panel-icon">📋</div>
+        <span class="panel-title">Contract details</span>
+        <span class="badge-verified" style="margin-left:auto;">✓ Verified</span>
+      </div>
+      <div class="panel-body">
+        <div class="info-tr">
+          <span class="info-key">Contract address</span>
+          <span class="info-val mono">0x5FeD...2107<button class="copy-btn" onclick="copyAddr()">copy</button></span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Network</span>
+          <span class="info-val">Arc Testnet</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Chain ID</span>
+          <span class="info-val mono">5042002</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">USDC token</span>
+          <span class="info-val mono">0x3600...0000</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Deployed by</span>
+          <span class="info-val green">Teerast</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Explorer</span>
+          <a href="https://testnet.arcscan.app/address/0x5FeD5f971dE23683D1544857DC2F238962822107" target="_blank" style="font-size:12px;color:var(--accent);">View on ArcScan ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TX HISTORY -->
+    <div class="panel" id="historySection">
+      <div class="panel-header">
+        <div class="panel-icon">📜</div>
+        <span class="panel-title">Recent transfers</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);" id="txCount">—</span>
+      </div>
+      <div class="panel-body" style="padding:0 1.25rem;">
+        <div id="txList"><div class="tx-empty">Connect wallet to load your transfer history.</div></div>
+      </div>
+    </div>
+
+    <!-- ARC INFO -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-icon">⬡</div>
+        <span class="panel-title">Why Arc Testnet?</span>
+      </div>
+      <div class="panel-body">
+        <div class="info-tr">
+          <span class="info-key">Gas cost</span>
+          <span class="info-val green">~$0.001 per TX</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Block time</span>
+          <span class="info-val">~0.5 seconds</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Native token</span>
+          <span class="info-val">USDC (by Circle)</span>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Explorer</span>
+          <a href="https://testnet.arcscan.app" target="_blank" style="font-size:12px;color:var(--accent);">testnet.arcscan.app ↗</a>
+        </div>
+        <div class="info-tr">
+          <span class="info-key">Faucet</span>
+          <a href="https://faucet.circle.com" target="_blank" style="font-size:12px;color:var(--accent);">faucet.circle.com ↗</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div style="margin-bottom:6px;">
+    TeerPay · Cross-border USDC Remittance · Built on <a href="https://arc.network" target="_blank">Arc™ Testnet</a>
+  </div>
+  <div style="margin-bottom:8px;">
+    Contract: <a href="https://testnet.arcscan.app/address/0x5FeD5f971dE23683D1544857DC2F238962822107" target="_blank">0x5FeD5f971dE23683D1544857DC2F238962822107</a>
+    · by <strong style="color:var(--text2);">Teerast</strong>
+    · <a href="https://github.com/Madaprtma/teerpay-web" target="_blank">GitHub</a>
+  </div>
+  <div style="margin-bottom:10px;">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#fff3cd;color:#856404;border:1px solid #ffc107;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:500;">
+      ⚠️ Testnet only — no real funds
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--text3);line-height:1.6;max-width:600px;margin:0 auto;">
+    Arc™ is a trademark of Circle Internet Group, Inc. and/or its affiliates.
+    TeerPay is an independent project built on Arc Network and is not affiliated with, endorsed by, or sponsored by Circle Internet Group, Inc.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<!-- Circle App Kit — Quick Send -->
+
+<!-- Circle Wallet — requires backend deployment to function -->
+<script>
+  // W3S SDK cannot be loaded directly in browser (no ESM/CDN build available).
+  // Circle Wallet login requires the circle-wallet-backend Cloudflare Worker.
+  // Until backend is deployed, show a helpful message.
+  window.startCircleWalletLogin = async function () {
+    const email = document.getElementById('cwEmail').value.trim();
+    if (!email) {
+      cwShowStatus('error', 'Enter your email first.');
+      return;
+    }
+
+    const CIRCLE_BACKEND_URL = 'https://teerpay-circle-backend.teerpay.workers.dev';
+
+    const btn = document.getElementById('cwContinueBtn');
+    btn.disabled = true;
+    try {
+      cwShowStatus('info', '⏳ Connecting...');
+      const loginRes = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const login = await loginRes.json();
+      if (!loginRes.ok) throw new Error(login.error || 'Login failed');
+
+      // PIN challenge is handled by the backend iframe, not W3S SDK
+      cwShowStatus('info', '⏳ Preparing your Arc Testnet wallet...');
+      const walletRes = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/create-wallet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userToken: login.userToken }),
+      });
+      const wallet = await walletRes.json();
+      if (!walletRes.ok) throw new Error(wallet.error || 'Could not create wallet');
+
+      // Store session
+      window._cwUserToken = login.userToken;
+      window._cwWalletId = wallet.walletId || null;
+      window._cwAddress = wallet.address || null;
+
+      cwShowStatus('success', `✅ Circle Wallet ready!` +
+        (window._cwAddress ? `<br><span style="font-family:monospace">${window._cwAddress.slice(0,6)}...${window._cwAddress.slice(-4)}</span>` : ''));
+      document.getElementById('connectBtn').style.display = 'none';
+      document.getElementById('walletInfo').style.display = 'flex';
+      document.getElementById('walletAddr').textContent = window._cwAddress
+        ? window._cwAddress.slice(0,6) + '...' + window._cwAddress.slice(-4)
+        : 'Circle Wallet';
+      document.getElementById('cwSendPanel').style.display = window._cwWalletId ? 'block' : 'none';
+      setTimeout(closeWalletModal, 1200);
+    } catch (e) {
+      cwShowStatus('error', '❌ ' + (e.message || 'Something went wrong. Is the backend deployed?'));
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  function cwShowStatus(type, msg) {
+    const b = document.getElementById('cwStatus');
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    b.style.background = type === 'error' ? '#fee2e2' : type === 'success' ? '#dcfce7' : '#dbeafe';
+    b.style.color    = type === 'error' ? '#b91c1c' : type === 'success' ? '#15803d' : '#1d4ed8';
+    b.style.border   = '1px solid ' + (type === 'error' ? '#fca5a5' : type === 'success' ? '#86efac' : '#93c5fd');
+  }
+
+  window.sendViaCircleWallet = async function () {
+    const toAddress = document.getElementById('cwToAddress').value.trim();
+    const amount    = document.getElementById('cwAmount').value;
+    if (!toAddress) { cwShowStatus('error', 'Enter a recipient address first.'); return; }
+    if (!amount || parseFloat(amount) <= 0) { cwShowStatus('error', 'Enter a valid amount.'); return; }
+    if (!window._cwWalletId || !window._cwUserToken) { cwShowStatus('error', 'Circle Wallet not connected.'); return; }
+
+    const CIRCLE_BACKEND_URL = 'https://teerpay-circle-backend.teerpay.workers.dev';
+    const btn = document.getElementById('cwSendBtn');
+    btn.disabled = true;
+    try {
+      cwShowStatus('info', '⏳ Preparing transfer...');
+      const res = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/create-transfer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userToken: window._cwUserToken,
+          walletId: window._cwWalletId,
+          destinationAddress: toAddress,
+          amount,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Transfer failed');
+      cwShowStatus('success', `✅ ${amount} USDC sent to ${toAddress.slice(0,6)}...${toAddress.slice(-4)}!`);
+    } catch (e) {
+      cwShowStatus('error', '❌ ' + (e.message || 'Something went wrong.'));
+    } finally {
+      btn.disabled = false;
+    }
+  };
+</script>
+
+<script>
+const ARC_CHAIN_ID  = 5042002;
+const ARC_RPC       = 'https://rpc.testnet.arc.network';
+const ARC_EXPLORER  = 'https://testnet.arcscan.app';
+const USDC_ADDR     = '0x3600000000000000000000000000000000000000';
+const CONTRACT_ADDR = '0x5FeD5f971dE23683D1544857DC2F238962822107';
+const USDC_DEC      = 6;
+
+const CORRIDORS = [
+  { flag:'🇮🇩', country:'Indonesia',   currency:'IDR', address:'0x018fBE6bB41b6bA47AfBC499b60375117A9373ea' },
+  { flag:'🇵🇭', country:'Philippines', currency:'PHP', address:'0xc68cAA6C024c7d844b0195EBE79aCc9820B4a1a4' },
+  { flag:'🇻🇳', country:'Vietnam',     currency:'VND', address:'0xF4E12151430a7D761EF355079f97c7c83AEf512c' },
+  { flag:'🇳🇬', country:'Nigeria',     currency:'NGN', address:'0xD4F8F759B80365966fB137E9D27640B5e379ADf6' },
+  { flag:'🇮🇳', country:'India',       currency:'INR', address:'0x384f05d832fDebE47C1030CC6935AE3a4325eCd0' },
+];
+
+const USDC_ABI = [
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function balanceOf(address account) view returns (uint256)',
+];
+const CONTRACT_ABI = [
+  'function sendRemittance(address recipient, uint256 amount, string country, string currency, string memo)',
+  'function getStats() view returns (uint256 totalVolume, uint256 totalTxCount, uint256 minAmount, uint256 maxAmount, bool paused)',
+  'event RemittanceSent(address indexed sender, address indexed recipient, uint256 amount, string country, string currency, string memo, uint256 timestamp)',
+];
+
+let provider, signer, userAddress;
+let selected = CORRIDORS[0];
+let txHistory = [];
+const readProvider = new ethers.providers.JsonRpcProvider(ARC_RPC); // reused instead of recreated per call
+
+// Retries a call a few times with backoff if the RPC returns 429 (rate limited)
+async function withRetry(fn, retries = 3, delayMs = 800) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const is429 = e?.status === 429 || /429|rate limit/i.test(e?.message || '') || /429|rate limit/i.test(e?.error?.message || '');
+      if (is429 && attempt < retries) {
+        await new Promise(r => setTimeout(r, delayMs * Math.pow(2, attempt)));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+window.addEventListener('load', async () => {
+  renderCorridors();
+  loadStats();
+
+  if (window.ethereum) {
+    // Restore session if the wallet is already connected/authorized
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts.length) await connectWallet();
+    } catch (e) { console.warn(e); }
+
+    // Keep UI in sync with wallet-side changes
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (!accounts.length) { disconnectWallet(); }
+      else { connectWallet(); }
+    });
+    window.ethereum.on('chainChanged', () => { window.location.reload(); });
+  }
+});
+
+function openWalletModal() {
+  document.getElementById('walletModalOverlay').classList.add('open');
+  document.getElementById('cwFlow').style.display = 'none';
+}
+function closeWalletModal() {
+  document.getElementById('walletModalOverlay').classList.remove('open');
+}
+function openCircleWalletFlow() {
+  document.getElementById('cwFlow').style.display = 'block';
+}
+
+function disconnectWallet() {
+  provider = signer = userAddress = undefined;
+  txHistory = [];
+  document.getElementById('connectBtn').style.display = 'inline-block';
+  document.getElementById('walletInfo').style.display = 'none';
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Connect wallet to send';
+  renderHistory();
+}
+
+function renderCorridors() {
+  document.getElementById('corridorGrid').innerHTML = CORRIDORS.map((c,i) => `
+    <button class="corridor-btn ${i===0?'active':''}" onclick="selectCorridor(${i})">
+      <span class="corridor-flag">${c.flag}</span>
+      <div class="corridor-info">
+        <div class="corridor-country">${c.country}</div>
+        <div class="corridor-currency">${c.currency}</div>
+      </div>
+    </button>`).join('');
+  updateAddrDisplay();
+}
+
+function selectCorridor(i) {
+  selected = CORRIDORS[i];
+  document.querySelectorAll('.corridor-btn').forEach((el,j) => el.classList.toggle('active', i===j));
+  updateAddrDisplay();
+}
+
+function updateAddrDisplay() {
+  document.getElementById('toAddrDisplay').textContent = selected.address;
+}
+
+async function loadStats() {
+  try {
+    const c = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, readProvider);
+    const s = await withRetry(() => c.getStats());
+    document.getElementById('statTxCount').textContent = s.totalTxCount.toString();
+    document.getElementById('statVolume').textContent  = parseFloat(ethers.utils.formatUnits(s.totalVolume, USDC_DEC)).toFixed(4);
+    if (s.paused) { document.getElementById('statStatus').textContent = 'Paused'; document.getElementById('statStatus').style.color = 'var(--amber)'; }
+  } catch(e) { console.warn(e); }
+}
+
+async function connectWallet() {
+  if (!window.ethereum) { alert('MetaMask not found. Please install MetaMask.'); return; }
+  try {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + ARC_CHAIN_ID.toString(16) }] });
+    } catch(e) {
+      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x' + ARC_CHAIN_ID.toString(16), chainName: 'Arc Testnet', nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: USDC_DEC }, rpcUrls: [ARC_RPC], blockExplorerUrls: [ARC_EXPLORER] }] });
+    }
+    provider    = new ethers.providers.Web3Provider(window.ethereum);
+    signer      = provider.getSigner();
+    userAddress = await signer.getAddress();
+    document.getElementById('connectBtn').style.display = 'none';
+    document.getElementById('walletInfo').style.display = 'flex';
+    document.getElementById('walletAddr').textContent = userAddress.slice(0,6)+'...'+userAddress.slice(-4);
+    await refreshBal();
+    await loadHistory();
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = false;
+    btn.textContent = 'Send via TeerPay →';
+    loadStats();
+    closeWalletModal();
+  } catch(e) { alert('Connection failed: '+e.message); }
+}
+
+async function refreshBal() {
+  if (!signer) return;
+  try {
+    const bal = await withRetry(() => new ethers.Contract(USDC_ADDR, USDC_ABI, provider).balanceOf(userAddress));
+    document.getElementById('walletBal').textContent = parseFloat(ethers.utils.formatUnits(bal, USDC_DEC)).toFixed(2)+' USDC';
+  } catch(e) { console.warn(e); }
+}
+
+async function loadHistory() {
+  const list = document.getElementById('txList');
+  try {
+    const c = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, provider);
+    const latestBlock = await withRetry(() => provider.getBlockNumber());
+    const fromBlock   = Math.max(0, latestBlock - 10000);
+    const events = await withRetry(() => c.queryFilter(c.filters.RemittanceSent(userAddress), fromBlock, latestBlock));
+    txHistory = events.reverse().slice(0,20).map(e => ({
+      country: e.args.country, currency: e.args.currency,
+      amount: ethers.utils.formatUnits(e.args.amount, USDC_DEC),
+      memo: e.args.memo, txHash: e.transactionHash
+    }));
+    renderHistory();
+  } catch(e) {
+    console.warn(e);
+    const rateLimited = e?.status === 429 || /429|rate limit/i.test(e?.message || '');
+    list.innerHTML = rateLimited
+      ? '<div class="tx-empty">RPC is rate-limited right now. Please wait a moment and refresh.</div>'
+      : '<div class="tx-empty">Unable to load transfer history right now. Please refresh and try again.</div>';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+function renderHistory() {
+  const flags = { Indonesia:'🇮🇩', Philippines:'🇵🇭', Vietnam:'🇻🇳', Nigeria:'🇳🇬', India:'🇮🇳' };
+  const list  = document.getElementById('txList');
+  document.getElementById('txCount').textContent = txHistory.length ? txHistory.length+' transfers' : '';
+  if (!txHistory.length) { list.innerHTML = '<div class="tx-empty">No transfers yet. Send your first remittance!</div>'; return; }
+  list.innerHTML = txHistory.map(tx => `
+    <div class="tx-item">
+      <span class="tx-flag">${flags[tx.country]||'🌍'}</span>
+      <div class="tx-mid">
+        <div class="tx-country">${escapeHtml(tx.country)} <span style="color:var(--text3);font-size:11px;font-family:var(--mono);">${escapeHtml(tx.currency)}</span></div>
+        <div class="tx-memo">${escapeHtml(tx.memo || '—')}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount">${parseFloat(tx.amount).toFixed(4)} USDC</div>
+        <a class="tx-link" href="${ARC_EXPLORER}/tx/${tx.txHash}" target="_blank">view ↗</a>
+      </div>
+    </div>`).join('');
+}
+
+async function sendRemittance() {
+  if (!signer) { alert('Connect wallet first.'); return; }
+  const amount = parseFloat(document.getElementById('amountInput').value);
+  const memo   = document.getElementById('memoInput').value || `TeerPay|${selected.country}|${selected.currency}|${amount}USDC`;
+  if (!amount || amount < 0.01) { showStatus('error','Minimum amount is 0.01 USDC.'); return; }
+  if (amount > 100)             { showStatus('error','Maximum amount is 100 USDC.'); return; }
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  try {
+    const amtRaw = ethers.utils.parseUnits(amount.toFixed(6), USDC_DEC);
+    const usdc   = new ethers.Contract(USDC_ADDR, USDC_ABI, signer);
+    const cp     = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, signer);
+    const allow  = await usdc.allowance(userAddress, CONTRACT_ADDR);
+    if (allow.lt(amtRaw)) {
+      showStatus('info','⏳ Step 1/2 — Approve USDC spend (confirm in MetaMask)');
+      await (await usdc.approve(CONTRACT_ADDR, amtRaw.mul(1000))).wait();
+    }
+    showStatus('info','⏳ Step 2/2 — Sending remittance (confirm in MetaMask)');
+    const tx      = await cp.sendRemittance(selected.address, amtRaw, selected.country, selected.currency, memo);
+    showStatus('info','⏳ Waiting for on-chain confirmation...');
+    const receipt = await tx.wait();
+    showStatus('success',`✅ ${amount} USDC sent to ${selected.country}!<br><a href="${ARC_EXPLORER}/tx/${receipt.transactionHash}" target="_blank">View on ArcScan ↗</a>`);
+    await refreshBal(); await loadHistory(); await loadStats();
+  } catch(e) {
+    showStatus('error','❌ '+(e?.reason||e?.message||'Transaction failed').slice(0,140));
+  } finally { btn.disabled = false; btn.textContent = 'Send via TeerPay →'; }
+}
+
+function showStatus(type, msg) {
+  const b = document.getElementById('statusBox');
+  b.className = type; b.innerHTML = msg; b.style.display = 'block';
+}
+function copyAddr() { navigator.clipboard.writeText(CONTRACT_ADDR); alert('Contract address copied!'); }
+function scrollToHistory() { document.getElementById('historySection').scrollIntoView({behavior:'smooth'}); }
+function scrollToContract() { document.getElementById('contractSection').scrollIntoView({behavior:'smooth'}); }
+</script>
+</body>
 </html>
