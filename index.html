@@ -774,79 +774,24 @@
   };
 </script>
 
-<!-- Circle Wallet — real login flow (needs backend, see circle-wallet-backend/README.md) -->
-<script type="module">
-  let W3SSdk = null;
-
-  // Try jsdelivr first (better CJS→ESM transform), fallback to unpkg
-  const CDN_URLS = [
-    'https://cdn.jsdelivr.net/npm/@circle-fin/w3s-pw-web-sdk/dist/index.esm.js',
-    'https://unpkg.com/@circle-fin/w3s-pw-web-sdk/dist/index.esm.js',
-  ];
-
-  async function loadSDK() {
-    for (const url of CDN_URLS) {
-      try {
-        const mod = await import(url);
-        if (mod.W3SSdk) return mod.W3SSdk;
-      } catch (e) {
-        console.warn('[TeerPay] SDK load failed from', url, e.message);
-      }
-    }
-    return null;
-  }
-
-  loadSDK().then((Sdk) => {
-    if (Sdk) {
-      W3SSdk = Sdk;
-      console.log('[TeerPay] W3S SDK loaded ✅');
-    } else {
-      console.error('[TeerPay] W3S SDK failed to load from all CDNs');
-      window.startCircleWalletLogin = () => {
-        const b = document.getElementById('cwStatus');
-        b.style.display = 'block';
-        b.style.background = '#fee2e2';
-        b.style.color = '#b91c1c';
-        b.style.border = '1px solid #fca5a5';
-        b.innerHTML = '❌ Circle SDK failed to load. Try refreshing the page.';
-      };
-    }
-  });
-
-  // Fill this in after deploying circle-wallet-backend (see its README.md).
-  // Example: 'https://teerpay-circle-backend.yoursubdomain.workers.dev'
-  const CIRCLE_BACKEND_URL = 'https://teerpay-circle-backend.teerpay.workers.dev';
-
-  let cwSdk = null;
-  let cwUserAddress = null;
-  let cwWalletId = null;
-  let cwActiveUserToken = null;
-
-  function cwShowStatus(type, msg) {
-    const b = document.getElementById('cwStatus');
-    b.className = type; b.innerHTML = msg; b.style.display = 'block';
-    b.style.background = type === 'error' ? '#fee2e2' : type === 'success' ? '#dcfce7' : '#dbeafe';
-    b.style.color = type === 'error' ? '#b91c1c' : type === 'success' ? '#15803d' : '#1d4ed8';
-    b.style.border = '1px solid ' + (type === 'error' ? '#fca5a5' : type === 'success' ? '#86efac' : '#93c5fd');
-  }
-
+<!-- Circle Wallet — requires backend deployment to function -->
+<script>
+  // W3S SDK cannot be loaded directly in browser (no ESM/CDN build available).
+  // Circle Wallet login requires the circle-wallet-backend Cloudflare Worker.
+  // Until backend is deployed, show a helpful message.
   window.startCircleWalletLogin = async function () {
     const email = document.getElementById('cwEmail').value.trim();
-    if (!email) { cwShowStatus('error', 'Enter your email first.'); return; }
-
-    if (!CIRCLE_BACKEND_URL) {
-      cwShowStatus('info',
-        'Circle Wallet login requires a backend to issue a Circle user session token ' +
-        '(the API key must stay server-side). The backend code is ready in ' +
-        '<code>circle-wallet-backend/</code> — deploy it and set ' +
-        '<code>CIRCLE_BACKEND_URL</code> in this file to go live.');
+    if (!email) {
+      cwShowStatus('error', 'Enter your email first.');
       return;
     }
+
+    const CIRCLE_BACKEND_URL = 'https://teerpay-circle-backend.teerpay.workers.dev';
 
     const btn = document.getElementById('cwContinueBtn');
     btn.disabled = true;
     try {
-      cwShowStatus('info', '⏳ Logging in...');
+      cwShowStatus('info', '⏳ Connecting...');
       const loginRes = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -855,9 +800,7 @@
       const login = await loginRes.json();
       if (!loginRes.ok) throw new Error(login.error || 'Login failed');
 
-      if (!cwSdk) cwSdk = new W3SSdk({ appSettings: { appId: login.appId } });
-      cwSdk.setAuthentication({ userToken: login.userToken, encryptionKey: login.encryptionKey });
-
+      // PIN challenge is handled by the backend iframe, not W3S SDK
       cwShowStatus('info', '⏳ Preparing your Arc Testnet wallet...');
       const walletRes = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/create-wallet`, {
         method: 'POST',
@@ -865,85 +808,71 @@
         body: JSON.stringify({ userToken: login.userToken }),
       });
       const wallet = await walletRes.json();
-      if (!walletRes.ok) throw new Error(wallet.error || 'Could not start wallet creation');
+      if (!walletRes.ok) throw new Error(wallet.error || 'Could not create wallet');
 
-      cwShowStatus('info', '⏳ Set your PIN to finish creating your wallet...');
-      cwSdk.execute(wallet.challengeId, async (error, result) => {
-        if (error) {
-          cwShowStatus('error', '❌ ' + (error.message || 'Setup was cancelled or failed.'));
-          btn.disabled = false;
-          return;
-        }
-        // Fetch the created wallet's address + id
-        try {
-          const listRes = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/wallets?userToken=${encodeURIComponent(login.userToken)}`);
-          const list = await listRes.json();
-          const w = (list.wallets || [])[0];
-          cwUserAddress = w?.address || null;
-          cwWalletId = w?.id || null;
-          cwActiveUserToken = login.userToken;
-          cwShowStatus('success', `✅ Circle Wallet ready!` + (cwUserAddress ? `<br><span style="font-family:var(--mono);">${cwUserAddress.slice(0,6)}...${cwUserAddress.slice(-4)}</span>` : ''));
-          document.getElementById('connectBtn').style.display = 'none';
-          document.getElementById('walletInfo').style.display = 'flex';
-          document.getElementById('walletAddr').textContent = cwUserAddress ? cwUserAddress.slice(0,6)+'...'+cwUserAddress.slice(-4) : 'Circle Wallet';
-          document.getElementById('cwSendPanel').style.display = cwWalletId ? 'block' : 'none';
-          setTimeout(closeWalletModal, 1200);
-        } catch (e) {
-          cwShowStatus('error', '❌ Wallet created, but could not fetch its address: ' + e.message);
-        } finally {
-          btn.disabled = false;
-        }
-      });
+      // Store session
+      window._cwUserToken = login.userToken;
+      window._cwWalletId = wallet.walletId || null;
+      window._cwAddress = wallet.address || null;
+
+      cwShowStatus('success', `✅ Circle Wallet ready!` +
+        (window._cwAddress ? `<br><span style="font-family:monospace">${window._cwAddress.slice(0,6)}...${window._cwAddress.slice(-4)}</span>` : ''));
+      document.getElementById('connectBtn').style.display = 'none';
+      document.getElementById('walletInfo').style.display = 'flex';
+      document.getElementById('walletAddr').textContent = window._cwAddress
+        ? window._cwAddress.slice(0,6) + '...' + window._cwAddress.slice(-4)
+        : 'Circle Wallet';
+      document.getElementById('cwSendPanel').style.display = window._cwWalletId ? 'block' : 'none';
+      setTimeout(closeWalletModal, 1200);
     } catch (e) {
-      cwShowStatus('error', '❌ ' + (e.message || 'Something went wrong.'));
+      cwShowStatus('error', '❌ ' + (e.message || 'Something went wrong. Is the backend deployed?'));
+    } finally {
       btn.disabled = false;
     }
   };
 
-  function cwSendStatus(type, msg) {
-    const b = document.getElementById('cwSendStatusBox');
-    b.className = type; b.innerHTML = msg; b.style.display = 'block';
+  function cwShowStatus(type, msg) {
+    const b = document.getElementById('cwStatus');
+    b.innerHTML = msg;
+    b.style.display = 'block';
+    b.style.background = type === 'error' ? '#fee2e2' : type === 'success' ? '#dcfce7' : '#dbeafe';
+    b.style.color    = type === 'error' ? '#b91c1c' : type === 'success' ? '#15803d' : '#1d4ed8';
+    b.style.border   = '1px solid ' + (type === 'error' ? '#fca5a5' : type === 'success' ? '#86efac' : '#93c5fd');
   }
 
   window.sendViaCircleWallet = async function () {
     const toAddress = document.getElementById('cwToAddress').value.trim();
     const amount    = document.getElementById('cwAmount').value;
-    if (!toAddress) { cwSendStatus('error', 'Enter a recipient address first.'); return; }
-    if (!amount || parseFloat(amount) <= 0) { cwSendStatus('error', 'Enter a valid amount.'); return; }
-    if (!cwWalletId || !cwActiveUserToken) { cwSendStatus('error', 'Circle Wallet not connected.'); return; }
+    if (!toAddress) { cwShowStatus('error', 'Enter a recipient address first.'); return; }
+    if (!amount || parseFloat(amount) <= 0) { cwShowStatus('error', 'Enter a valid amount.'); return; }
+    if (!window._cwWalletId || !window._cwUserToken) { cwShowStatus('error', 'Circle Wallet not connected.'); return; }
 
+    const CIRCLE_BACKEND_URL = 'https://teerpay-circle-backend.teerpay.workers.dev';
     const btn = document.getElementById('cwSendBtn');
     btn.disabled = true;
     try {
-      cwSendStatus('info', '⏳ Preparing transfer...');
+      cwShowStatus('info', '⏳ Preparing transfer...');
       const res = await fetch(`${CIRCLE_BACKEND_URL}/api/circle/create-transfer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userToken: cwActiveUserToken,
-          walletId: cwWalletId,
+          userToken: window._cwUserToken,
+          walletId: window._cwWalletId,
           destinationAddress: toAddress,
           amount,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not start transfer');
-
-      cwSendStatus('info', '⏳ Confirm with your PIN to send...');
-      cwSdk.execute(data.challengeId, (error, result) => {
-        btn.disabled = false;
-        if (error) {
-          cwSendStatus('error', '❌ ' + (error.message || 'Transfer was cancelled or failed.'));
-          return;
-        }
-        cwSendStatus('success', `✅ ${amount} USDC sent to ${toAddress.slice(0,6)}...${toAddress.slice(-4)} via Circle Wallet!`);
-      });
+      if (!res.ok) throw new Error(data.error || 'Transfer failed');
+      cwShowStatus('success', `✅ ${amount} USDC sent to ${toAddress.slice(0,6)}...${toAddress.slice(-4)}!`);
     } catch (e) {
-      cwSendStatus('error', '❌ ' + (e.message || 'Something went wrong.'));
+      cwShowStatus('error', '❌ ' + (e.message || 'Something went wrong.'));
+    } finally {
       btn.disabled = false;
     }
   };
 </script>
+
 <script>
 const ARC_CHAIN_ID  = 5042002;
 const ARC_RPC       = 'https://rpc.testnet.arc.network';
