@@ -6,8 +6,8 @@
   <!-- Taruh setelah <meta name="viewport" ...> -->
 <meta http-equiv="Content-Security-Policy" 
   content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
-           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://esm.sh https://*.esm.sh;
-           connect-src 'self' https://*.circle.com https://teerpay-circle-backend.teerpay.workers.dev https://rpc.testnet.arc.network https://fonts.googleapis.com https://fonts.gstatic.com https://esm.sh https://*.esm.sh https://*.cloudflare.com;
+           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://esm.sh https://*.esm.sh;
+           connect-src 'self' https://*.circle.com https://teerpay-circle-backend.teerpay.workers.dev https://rpc.testnet.arc.network https://fonts.googleapis.com https://fonts.gstatic.com https://esm.sh https://*.esm.sh https://*.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com;
            style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
            font-src 'self' data: https://fonts.gstatic.com;
            frame-src 'self' https://*.circle.com blob:;
@@ -778,19 +778,40 @@
 <script type="module">
   let W3SSdk = null;
 
-  import('https://esm.sh/@circle-fin/w3s-pw-web-sdk')
-    .then((mod) => { W3SSdk = mod.W3SSdk; })
-    .catch((e) => {
-      console.error('[TeerPay] W3S SDK load failed:', e);
+  // Try jsdelivr first (better CJS→ESM transform), fallback to unpkg
+  const CDN_URLS = [
+    'https://cdn.jsdelivr.net/npm/@circle-fin/w3s-pw-web-sdk/dist/index.esm.js',
+    'https://unpkg.com/@circle-fin/w3s-pw-web-sdk/dist/index.esm.js',
+  ];
+
+  async function loadSDK() {
+    for (const url of CDN_URLS) {
+      try {
+        const mod = await import(url);
+        if (mod.W3SSdk) return mod.W3SSdk;
+      } catch (e) {
+        console.warn('[TeerPay] SDK load failed from', url, e.message);
+      }
+    }
+    return null;
+  }
+
+  loadSDK().then((Sdk) => {
+    if (Sdk) {
+      W3SSdk = Sdk;
+      console.log('[TeerPay] W3S SDK loaded ✅');
+    } else {
+      console.error('[TeerPay] W3S SDK failed to load from all CDNs');
       window.startCircleWalletLogin = () => {
         const b = document.getElementById('cwStatus');
         b.style.display = 'block';
         b.style.background = '#fee2e2';
         b.style.color = '#b91c1c';
         b.style.border = '1px solid #fca5a5';
-        b.innerHTML = '❌ Circle SDK failed to load. Check your browser console.';
+        b.innerHTML = '❌ Circle SDK failed to load. Try refreshing the page.';
       };
-    });
+    }
+  });
 
   // Fill this in after deploying circle-wallet-backend (see its README.md).
   // Example: 'https://teerpay-circle-backend.yoursubdomain.workers.dev'
